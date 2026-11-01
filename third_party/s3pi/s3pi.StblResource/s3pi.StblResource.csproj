@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>s3pi.StblResource</AssemblyName>
+    <RootNamespace>StblResource</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../s3pi.Interfaces/s3pi.Interfaces.csproj" />
+    <ProjectReference Include="../s3pi.Settings/s3pi.Settings.csproj" />
+  </ItemGroup>
+</Project>

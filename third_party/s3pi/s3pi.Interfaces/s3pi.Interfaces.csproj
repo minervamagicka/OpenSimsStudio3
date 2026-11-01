@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>s3pi.Interfaces</AssemblyName>
+    <RootNamespace>s3pi.Interfaces</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../System.Custom/System.Custom.csproj" />
+    <ProjectReference Include="../s3pi.Settings/s3pi.Settings.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Present upstream but not in upstream's compile list. -->
+    <Compile Remove="ConstructorParametersAttribute.cs;DataGridExpandableAttribute.cs" />
+  </ItemGroup>
+</Project>

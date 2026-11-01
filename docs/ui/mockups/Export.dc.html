@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OpenSimsStudio³ · Export window</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#11161E}
+a{color:#FFAF99}a:hover{color:#FFC2AF}
+.btn{font:inherit;font-size:13px;color:#F2F5F8;background:#252E3A;border:1px solid #394353;border-radius:6px;padding:8px 14px;min-height:36px;box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:#2B3543;color:#FFFFFF}
+.primary{background:#FF9379;border-color:#FF9379;color:#11161E;font-weight:600}
+.primary:hover{background:#FFAF99;color:#11161E}
+.field{font:inherit;font-size:13px;color:#F2F5F8;background:#11161E;border:1px solid #394353;border-radius:6px;padding:8px 11px}
+.cb{display:flex;gap:8px;align-items:center;font-size:13px;color:#D6D8DC;min-height:28px}
+.ok{color:#A8DBB8}
+.warn{color:#F2C46D}
+</style>
+</helmet>
+<div style="width: 1040px; height: 760px; box-sizing: border-box; padding: 40px; background: #0C0D0F; font-family: Inter, system-ui, sans-serif; color: #F2F5F8; display: flex">
+  <div role="dialog" aria-labelledby="dlgTitle" style="flex: 1 1 auto; display: flex; flex-direction: column; background: #161C25; border: 1px solid #394353; border-radius: 12px; overflow: hidden">
+
+    <div style="display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid #33404E">
+      <h1 id="dlgTitle" style="margin: 0; font-size: 16px; font-weight: 600; flex: 1 1 auto">Export · Long denim skirt</h1>
+      <a class="btn" href="Editor.dc.html" aria-label="Close and return to the editor">✕</a>
+    </div>
+
+    <div style="flex: 1 1 auto; display: flex; min-height: 0">
+      <section style="flex: 1 1 auto; padding: 16px 18px; overflow-y: auto; border-right: 1px solid #33404E">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px">
+          <h2 style="margin: 0; font-size: 14px; font-weight: 600; flex: 1 1 auto">Checks</h2>
+          <span style="{{summaryStyle}}">{{summary}}</span>
+        </div>
+        <ul style="margin: 0; padding: 0; list-style: none">
+          <sc-for list="{{checks}}" as="c" hint-placeholder-count="8">
+            <li style="display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-top: 1px solid #33404E; font-size: 13px">
+              <span style="{{c.markStyle}}">{{c.mark}}</span>
+              <span style="flex: 1 1 auto">{{c.label}}</span>
+              <sc-if value="{{c.showable}}" hint-placeholder-val="{{ false }}">
+                <a class="btn" href="Editor.dc.html">Show</a>
+              </sc-if>
+            </li>
+          </sc-for>
+        </ul>
+      </section>
+
+      <section style="flex: 0 0 360px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px">
+          <legend style="font-size: 12px; color: #ACBAC8; margin-bottom: 4px">Formats</legend>
+          <label class="cb"><input type="checkbox" checked style="width: 16px; height: 16px; accent-color: #FF9379">.package (Mods folder)</label>
+          <label class="cb"><input type="checkbox" checked style="width: 16px; height: 16px; accent-color: #FF9379">.sims3pack (game launcher)</label>
+          <span style="font-size: 12px; color: #ACBAC8; margin-top: 4px">Target: OpenTS3 only</span>
+        </fieldset>
+        <label class="cb"><input type="checkbox" checked style="width: 16px; height: 16px; accent-color: #FF9379">Compress textures and meshes</label>
+        <label for="out" style="font-size: 12px; color: #ACBAC8; margin-top: 4px">Save to folder</label>
+        <div style="display: flex; gap: 8px">
+          <input id="out" class="field" type="text" value="[YOUR FOLDER]" style="flex: 1 1 auto; min-width: 0">
+          <button class="btn" type="button">Browse…</button>
+        </div>
+        <div style="border-top: 1px solid #33404E; margin-top: 6px; padding-top: 10px; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 12px; color: #ACBAC8">Test in game</span>
+          <label class="cb"><input type="checkbox" checked style="width: 16px; height: 16px; accent-color: #FF9379">Copy to my test profile's Mods folder</label>
+          <label class="cb"><input type="checkbox" checked style="width: 16px; height: 16px; accent-color: #FF9379">Clear that profile's CAS caches</label>
+        </div>
+        <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+          <div style="border: 1px solid #2F5A3E; background: #16241B; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px">
+            <span class="ok" style="font-size: 13px; font-weight: 600">✓ Exported</span>
+            <span style="font-size: 12px; color: #D3DCE5">long_denim_skirt.package and long_denim_skirt.sims3pack</span>
+            <span style="display: flex; gap: 8px"><button class="btn" type="button">Show in folder</button><button class="btn" type="button">Launch test game</button></span>
+          </div>
+        </sc-if>
+      </section>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px; padding: 12px 18px; border-top: 1px solid #33404E; background: #161C25">
+      <a class="btn" href="Editor.dc.html">Cancel</a>
+      <button class="btn primary" type="button" onClick="{{exportNow}}">{{exportLabel}}</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1040,"height":760}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { done: false };
+  }
+  renderVals() {
+    const pass = (label) => ({ label, ok: true });
+    const checks = [
+      pass('Item flags'),
+      pass('Mesh format'),
+      pass('Bones and weights'),
+      pass('Morphs'),
+      pass('LODs'),
+      { label: 'UV layout: 1 island overlaps the body', ok: false, showable: true },
+      pass('Recolours and textures'),
+      pass('Thumbnails and keys'),
+    ].map((c) => ({
+      ...c,
+      showable: !!c.showable,
+      mark: c.ok ? '✓' : '!',
+      markStyle: 'font-family: JetBrains Mono, monospace; width: 16px; color: ' + (c.ok ? '#A8DBB8' : '#F2C46D'),
+    }));
+    const warnings = checks.filter((c) => !c.ok).length;
+    return {
+      checks,
+      summary: warnings ? warnings + ' warning' : 'All checks passed',
+      summaryStyle: 'font-size: 12px; color: ' + (warnings ? '#F2C46D' : '#A8DBB8'),
+      done: this.state.done,
+      exportLabel: this.state.done ? 'Export again' : 'Export',
+      exportNow: () => this.setState({ done: true }),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!-- The desktop app (Avalonia 12). -->
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <AssemblyName>OpenSimsStudio3</AssemblyName>
+        <ApplicationIcon>Assets/oss3_icon.ico</ApplicationIcon>
+    </PropertyGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets/oss3_icon.png" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.1.3" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.1.3" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.3" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.3" />
+        <ProjectReference Include="../OpenSimsStudio3.Formats/OpenSimsStudio3.Formats.csproj" />
+        <ProjectReference Include="../OpenSimsStudio3.Rendering/OpenSimsStudio3.Rendering.csproj" />
+    </ItemGroup>
+</Project>

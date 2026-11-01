@@ -1,0 +1,17 @@
+<Project>
+  <!-- The repo-wide props (ArtifactsPath) would otherwise be shadowed by this file. -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- C# 13, not the .NET 10 default (C# 14): C# 14 makes `field` a contextual keyword inside property
+         accessors, which would change the meaning of any identifier named `field` there (s3pi uses that name,
+         e.g. ShaderData). 13 is the last language version that keeps upstream's semantics. -->
+    <LangVersion>13</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <!-- AssemblyInfo.cs and AssemblyVersion.cs are upstream's/ours; do not auto-generate. -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
+    <NoWarn>$(NoWarn);CS1591;CS0108;CS0114;CS0168;CS0169;CS0219;CS0414;CS0649;CS0618;CS0659;CS0661;CS8981</NoWarn>
+  </PropertyGroup>
+</Project>

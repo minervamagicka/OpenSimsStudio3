@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!-- Reading and writing TS3 resources. Wraps the s3pi port (third_party/s3pi) behind our own types. -->
+    <ItemGroup>
+        <ProjectReference Include="../../third_party/s3pi/System.Custom/System.Custom.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.Settings/s3pi.Settings.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.Interfaces/s3pi.Interfaces.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.Package/s3pi.Package.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.GenericRCOLResource/s3pi.GenericRCOLResource.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.RCOLChunks/s3pi.RCOLChunks.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.MeshChunks/s3pi.MeshChunks.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.CASPartResource/s3pi.CASPartResource.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.TxtcResource/s3pi.TxtcResource.csproj" />
+        <!-- The RCOL block registry discovers chunk types from loaded assemblies (see third_party/s3pi/README.md). -->
+        <ProjectReference Include="../../third_party/s3pi/s3pi.JazzResource/s3pi.JazzResource.csproj" />
+    </ItemGroup>
+</Project>

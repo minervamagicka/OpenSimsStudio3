@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!-- Command-line checks against a real install: prints numbers, never writes to game files. -->
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- Reads enum names and values from game script assemblies without loading their code. -->
+        <PackageReference Include="System.Reflection.MetadataLoadContext" Version="10.0.11" />
+        <ProjectReference Include="../OpenSimsStudio3.Formats/OpenSimsStudio3.Formats.csproj" />
+        <ProjectReference Include="../OpenSimsStudio3.Rendering/OpenSimsStudio3.Rendering.csproj" />
+        <!-- The remaining s3pi wrappers, so the unknowns survey can parse every type s3pi knows. -->
+        <ProjectReference Include="../../third_party/s3pi/s3pi.CatalogResource/s3pi.CatalogResource.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.TxtcResource/s3pi.TxtcResource.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.ObjKeyResource/s3pi.ObjKeyResource.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.ModularResource/s3pi.ModularResource.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.RigResource/s3pi.RigResource.csproj" />
+        <ProjectReference Include="../../third_party/s3pi/s3pi.StblResource/s3pi.StblResource.csproj" />
+    </ItemGroup>
+</Project>

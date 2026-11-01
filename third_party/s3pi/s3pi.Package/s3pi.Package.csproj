@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>s3pi.Package</AssemblyName>
+    <RootNamespace>s3pi.Package</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../System.Custom/System.Custom.csproj" />
+    <ProjectReference Include="../s3pi.Interfaces/s3pi.Interfaces.csproj" />
+    <ProjectReference Include="../s3pi.Settings/s3pi.Settings.csproj" />
+  </ItemGroup>
+</Project>

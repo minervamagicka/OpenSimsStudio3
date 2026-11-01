@@ -1,0 +1,15 @@
+<Project>
+    <PropertyGroup>
+        <!-- One output folder for the whole repo (artifacts/, git-ignored). -->
+        <UseArtifactsOutput>true</UseArtifactsOutput>
+        <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+    </PropertyGroup>
+    <!-- Our own projects; third_party keeps its original settings. -->
+    <PropertyGroup Condition="!$(MSBuildProjectDirectory.Contains('third_party'))">
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>latest</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+</Project>

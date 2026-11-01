@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>s3pi.MeshChunks</AssemblyName>
+    <RootNamespace>meshExpImp.ModelBlocks</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../System.Custom/System.Custom.csproj" />
+    <ProjectReference Include="../s3pi.Interfaces/s3pi.Interfaces.csproj" />
+    <ProjectReference Include="../s3pi.Settings/s3pi.Settings.csproj" />
+    <ProjectReference Include="../s3pi.GenericRCOLResource/s3pi.GenericRCOLResource.csproj" />
+    <ProjectReference Include="../s3pi.RCOLChunks/s3pi.RCOLChunks.csproj" />
+  </ItemGroup>
+</Project>

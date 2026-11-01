@@ -1,0 +1,70 @@
+<UserControl x:Class="OpenSimsStudio3.App.BrowseView"
+             xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:OpenSimsStudio3.App" x:DataType="app:BrowseTile">
+    <!-- "Clone a game item": pick the EA part to start from. Layout follows the mockup's browse screen. -->
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Border BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="34,0,34,14">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                <Button x:Name="BackButton" Content="← Back" HorizontalAlignment="Left" MinHeight="40" Padding="14,8" />
+                <TextBlock x:Name="Status" Grid.Column="1" Margin="16,0" VerticalAlignment="Center" Foreground="{StaticResource Muted}" FontSize="13" />
+                <ComboBox x:Name="SpeciesBox" Grid.Column="2" Width="150" Margin="0,0,10,0" />
+                <TextBox x:Name="SearchBox" Grid.Column="3" Width="300" PlaceholderText="Search by name" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" ColumnDefinitions="220,*,300">
+            <ListBox x:Name="Categories" Classes="rail" Background="{StaticResource Rail}" Padding="10,12" BorderThickness="0" />
+            <ListBox x:Name="Items" Grid.Column="1" Background="Transparent" BorderThickness="0" Padding="18,16">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate><WrapPanel ItemSpacing="12" LineSpacing="12" /></ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="app:BrowseTile">
+                        <StackPanel Width="140" Spacing="6">
+                            <Border Width="140" Height="140" CornerRadius="6" Background="#0C1016">
+                                <Grid>
+                                    <Image Source="{Binding Thumbnail}" Stretch="Uniform" />
+                                    <TextBlock Text="{Binding Glyph}" FontSize="30" Foreground="#394353" HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" IsVisible="{Binding !HasThumbnail}" />
+                                    <Image Source="{Binding ProductIcon}" Width="18" Height="18" Margin="6" HorizontalAlignment="Right"
+                                           VerticalAlignment="Bottom" />
+                                </Grid>
+                            </Border>
+                            <TextBlock Text="{Binding Name}" FontSize="12" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Border Grid.Column="2" Background="{StaticResource Rail}" BorderBrush="{StaticResource Line}" BorderThickness="1,0,0,0" Padding="18">
+                <StackPanel x:Name="Details" Spacing="10">
+                    <Border Height="264" CornerRadius="8" Background="#0C1016" BorderBrush="{StaticResource Line}" BorderThickness="1">
+                        <Grid>
+                            <Image x:Name="DetailImage" Stretch="Uniform" />
+                            <TextBlock x:Name="DetailGlyph" FontSize="56" Foreground="#394353" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                    <TextBlock x:Name="DetailName" FontSize="15" FontWeight="SemiBold" />
+                    <SelectableTextBlock x:Name="DetailKey" FontFamily="Consolas" FontSize="12" Foreground="{StaticResource Muted}" />
+                    <TextBlock x:Name="DetailFacts" FontSize="13" Foreground="#D3DCE5" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="34,16,34,20">
+            <Grid ColumnDefinitions="Auto,24,320,*,250">
+                <StackPanel Spacing="8">
+                    <TextBlock Classes="eyebrow" Text="TARGET" />
+                    <StackPanel x:Name="Targets" Orientation="Horizontal" Spacing="4" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="8">
+                    <TextBlock Classes="eyebrow" Text="PROJECT NAME" />
+                    <TextBox x:Name="ProjectName" />
+                </StackPanel>
+                <StackPanel Grid.Column="4" Spacing="6">
+                    <TextBlock x:Name="CreateStatus" FontSize="12" Foreground="{StaticResource Muted}" HorizontalAlignment="Right" />
+                    <Button x:Name="CreateButton" Classes="primary" Content="Create project" IsEnabled="False" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

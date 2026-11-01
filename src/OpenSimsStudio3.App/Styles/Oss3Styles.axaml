@@ -1,0 +1,205 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- OSS3's dark, launcher-like look, written for this app. Loaded after FluentTheme (Program/App.Initialize), so
+         equal-specificity rules here win over Fluent's. -->
+    <Styles.Resources>
+        <!-- Palette. Ink: window background; Rail: side panels; Line: hairline borders; Muted: secondary text. -->
+        <SolidColorBrush x:Key="Ink" Color="#11161E" />
+        <SolidColorBrush x:Key="Rail" Color="#0E1319" />
+        <SolidColorBrush x:Key="Line" Color="#26303C" />
+        <SolidColorBrush x:Key="Muted" Color="#8C98A8" />
+        <SolidColorBrush x:Key="Coral" Color="#FF8F70" />
+        <SolidColorBrush x:Key="Warn" Color="#F2B84B" />
+        <!-- Shared by the rules below. -->
+        <SolidColorBrush x:Key="Surface" Color="#1A222D" />
+        <SolidColorBrush x:Key="SurfaceHover" Color="#232E3B" />
+        <SolidColorBrush x:Key="Edge" Color="#33404E" />
+        <SolidColorBrush x:Key="EdgeHover" Color="#4B5D72" />
+        <SolidColorBrush x:Key="Selected" Color="#1E2733" />
+        <SolidColorBrush x:Key="OnCoral" Color="#1B0F0B" />
+        <SolidColorBrush x:Key="CoralHover" Color="#FFA78E" />
+        <SolidColorBrush x:Key="CoralPressed" Color="#E57A5B" />
+        <SolidColorBrush x:Key="CoralOff" Color="#3B2A26" />
+        <SolidColorBrush x:Key="CoralTint" Color="#3A2623" />
+    </Styles.Resources>
+
+    <!-- Text -->
+    <Style Selector="TextBlock.eyebrow">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="LetterSpacing" Value="0.6" />
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+    </Style>
+
+    <!-- Buttons: outlined on a transparent face; the face and border are set on the template's presenter because
+         Fluent's hover/pressed/disabled rules write there. -->
+    <Style Selector="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{StaticResource Edge}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+    </Style>
+    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource SurfaceHover}" />
+        <Setter Property="BorderBrush" Value="{StaticResource EdgeHover}" />
+    </Style>
+    <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource Selected}" />
+    </Style>
+    <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="Opacity" Value="0.6" />
+    </Style>
+
+    <!-- Selected choice (the target buttons): coral outline. -->
+    <Style Selector="Button.selected">
+        <Setter Property="BorderBrush" Value="{StaticResource Coral}" />
+    </Style>
+    <Style Selector="Button.selected /template/ ContentPresenter#PART_ContentPresenter, Button.selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource Selected}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Coral}" />
+    </Style>
+
+    <!-- Primary action: solid coral. -->
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="{StaticResource Coral}" />
+        <Setter Property="Foreground" Value="{StaticResource OnCoral}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Padding" Value="20,8" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.primary /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource Coral}" />
+        <Setter Property="Foreground" Value="{StaticResource OnCoral}" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource CoralHover}" />
+        <Setter Property="Foreground" Value="{StaticResource OnCoral}" />
+    </Style>
+    <Style Selector="Button.primary:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource CoralPressed}" />
+    </Style>
+    <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource CoralOff}" />
+        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <!-- Navigation: flat, left-aligned rows (start-screen rail, editor outline); selected row gets a coral bar. -->
+    <Style Selector="Button.navigation">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="MinHeight" Value="44" />
+        <Setter Property="Padding" Value="19,6" />
+        <Setter Property="Foreground" Value="#C9D2DC" />
+    </Style>
+    <Style Selector="Button.navigation /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.navigation:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource Selected}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.navigation.selected /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource Selected}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Coral}" />
+        <Setter Property="BorderThickness" Value="3,0,0,0" />
+    </Style>
+
+    <!-- Start cards: large tiles with a small icon square. -->
+    <Style Selector="Button.card">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="Padding" Value="18" />
+        <Setter Property="MinHeight" Value="128" />
+        <Setter Property="CornerRadius" Value="6" />
+    </Style>
+    <Style Selector="Button.card /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#E61A222D" />
+        <Setter Property="BorderBrush" Value="#2E3A48" />
+    </Style>
+    <Style Selector="Button.card:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource SurfaceHover}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Coral}" />
+    </Style>
+    <Style Selector="Border.cardIcon">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Background" Value="{StaticResource CoralTint}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style Selector="Border.cardIcon > TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource Coral}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Chips: small pills on the start screen's Found strip and the editor's header. -->
+    <Style Selector="Border.chip">
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Background" Value="#161C25" />
+        <Setter Property="BorderBrush" Value="#2E3A48" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10,4" />
+    </Style>
+    <Style Selector="WrapPanel > Border.chip">
+        <Setter Property="MinHeight" Value="32" />
+    </Style>
+
+    <!-- Lists. Plain ListBoxItem: the tile grid in Browse (selected tile gets a coral outline). -->
+    <Style Selector="ListBoxItem">
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="BorderThickness" Value="1.5" />
+    </Style>
+    <Style Selector="ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#14FFFFFF" />
+    </Style>
+    <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter, ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{StaticResource Coral}" />
+    </Style>
+    <!-- "rail": the category list, rows like Button.navigation. -->
+    <Style Selector="ListBox.rail > ListBoxItem">
+        <Setter Property="Padding" Value="14,9" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="#C9D2DC" />
+    </Style>
+    <Style Selector="ListBox.rail > ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="ListBox.rail > ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter, ListBox.rail > ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource Selected}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Coral}" />
+        <Setter Property="BorderThickness" Value="3,0,0,0" />
+        <Setter Property="Foreground" Value="#F2F5F8" />
+    </Style>
+
+    <!-- Inputs -->
+    <Style Selector="TextBox, ComboBox">
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="BorderBrush" Value="{StaticResource Line}" />
+        <Setter Property="Background" Value="#161C25" />
+    </Style>
+    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="#161C25" />
+        <Setter Property="BorderBrush" Value="{StaticResource Edge}" />
+    </Style>
+    <Style Selector="ComboBox:pointerover /template/ Border#Background">
+        <Setter Property="Background" Value="#1A222D" />
+    </Style>
+</Styles>

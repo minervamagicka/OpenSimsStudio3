@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>System.Custom</AssemblyName>
+    <RootNamespace>System</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Upstream compiles it, but it needs System.Configuration.ConfigurationManager (WinForms/app.config only); not used by s3pi. -->
+    <Compile Remove="PortableSettingsProvider.cs" />
+  </ItemGroup>
+</Project>

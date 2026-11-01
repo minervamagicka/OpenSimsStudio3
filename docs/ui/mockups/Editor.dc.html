@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OpenSimsStudio³ · Editor</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#11161E}
+a{color:#FFAF99}a:hover{color:#FFC2AF}
+.btn{font:inherit;font-size:13px;color:#F2F5F8;background:#252E3A;border:1px solid #394353;border-radius:6px;padding:7px 12px;min-height:34px;box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:#2B3543;color:#FFFFFF}
+.primary{background:#FF9379;border-color:#FF9379;color:#11161E;font-weight:600}
+.primary:hover{background:#FFAF99;color:#11161E}
+.menu{font:inherit;font-size:13px;color:#D3DCE5;background:transparent;border:0;padding:6px 10px;border-radius:4px;cursor:pointer}
+.menu:hover{background:#252E3A;color:#FFFFFF}
+.node{font:inherit;font-size:13px;text-align:left;border:0;border-radius:5px;padding:6px 10px;min-height:32px;cursor:pointer;width:100%;display:flex;align-items:center;gap:8px}
+.head{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:#ACBAC8;padding:12px 10px 4px}
+details{border-top:1px solid #33404E}
+summary{cursor:pointer;padding:9px 4px;font-size:13px;font-weight:600;color:#F2F5F8}
+.row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:10px;align-items:start;padding:5px 4px;font-size:13px}
+.key{color:#ACBAC8;padding-top:3px}
+.cb{display:flex;gap:8px;align-items:center;font-size:13px;color:#D6D8DC;min-height:24px}
+.field{font:inherit;font-size:13px;color:#F2F5F8;background:#11161E;border:1px solid #394353;border-radius:5px;padding:6px 9px;width:100%;box-sizing:border-box}
+.mono{font-family:'JetBrains Mono',monospace;font-size:12px}
+.ok{color:#A8DBB8}
+.warn{color:#F2C46D}
+.slot{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:10px;align-items:center;padding:6px 4px;border-top:1px solid #252E3A;font-size:13px}
+</style>
+</helmet>
+<div style="position: relative; font-family: Inter, system-ui, sans-serif; color: #F2F5F8; background: #11161E; min-height: 900px; display: flex; flex-direction: column">
+
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 2px; padding: 4px 8px; background: #161C25; border-bottom: 1px solid #33404E">
+    <span style="display: flex; align-items: center; gap: 7px; font-weight: 700; font-size: 14px; padding: 0 12px 0 2px"><img src="oss3_icon.png" alt="" width="20" height="20" style="display: block">OpenSimsStudio³</span>
+    <button class="menu" type="button">File</button>
+    <button class="menu" type="button">Edit</button>
+    <button class="menu" type="button">View</button>
+    <button class="menu" type="button">Tools</button>
+    <button class="menu" type="button">Help</button>
+    <span style="flex: 1 1 auto"></span>
+    <span style="font-size: 13px; color: #ACBAC8; padding: 0 10px">Long denim skirt · cloned from afBottomSkirtLong</span>
+    <label for="target" style="font-size: 12px; color: #ACBAC8">Target</label>
+    <select id="target" class="field" onChange="{{pickTarget}}" style="width: auto; margin-right: 6px">
+      <sc-for list="{{targetOptions}}" as="o" hint-placeholder-count="3"><option selected="{{o.selected}}">{{o.label}}</option></sc-for>
+    </select>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 12px; background: #161C25; border-bottom: 1px solid #33404E">
+    <div role="group" aria-label="View mode" style="display: flex; gap: 2px; background: #1C2430; border: 1px solid #33404E; border-radius: 7px; padding: 3px">
+      <sc-for list="{{modes}}" as="m" hint-placeholder-count="5">
+        <button type="button" onClick="{{m.pick}}" aria-pressed="{{m.on}}" style="{{m.style}}">{{m.label}}</button>
+      </sc-for>
+    </div>
+    <label for="cam" style="font-size: 12px; color: #ACBAC8; margin-left: 6px">Camera</label>
+    <select id="cam" class="field" style="width: auto"><option>Free</option><option>Front</option><option>Side</option><option>Close-up</option><option>CAS</option></select>
+    <label class="cb" style="margin-left: 6px"><input type="checkbox" checked style="width: 15px; height: 15px; accent-color: #FF9379">Whole Sim</label>
+    <span style="flex: 1 1 auto"></span>
+    <button class="btn" type="button">Edit in Blender</button>
+    <button class="btn" type="button">Save</button>
+    <a class="btn primary" href="Export.dc.html">Export…</a>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; flex: 1 1 auto">
+
+    <nav aria-label="Project contents" style="flex: 1 1 190px; padding: 6px 8px 12px; background: #161C25; border-right: 1px solid #33404E; display: flex; flex-direction: column; gap: 1px">
+      <span class="head">Recolour</span>
+      <sc-for list="{{treeTextures}}" as="n" hint-placeholder-count="1"><button type="button" class="node" onClick="{{n.pick}}" style="{{n.style}}">{{n.label}}<span style="margin-left: auto; font-size: 11px; color: #ACBAC8">{{n.note}}</span></button></sc-for>
+      <span class="head">Mesh</span>
+      <sc-for list="{{treeMesh}}" as="n" hint-placeholder-count="5"><button type="button" class="node" onClick="{{n.pick}}" style="{{n.style}}">{{n.label}}<span style="margin-left: auto; font-size: 11px; color: #ACBAC8">{{n.note}}</span></button></sc-for>
+      <span class="head">Morphs</span>
+      <sc-for list="{{morphs}}" as="m" hint-placeholder-count="4">
+        <span style="display: flex; align-items: center; gap: 8px; padding: 5px 10px; font-size: 13px; color: #D3DCE5"><span class="ok" aria-hidden="true">✓</span>{{m.name}}<span style="position: absolute; width: 1px; height: 1px; overflow: hidden">present</span></span>
+      </sc-for>
+      <span class="head">Warnings</span>
+      <sc-for list="{{warnings}}" as="w" hint-placeholder-count="1">
+        <button type="button" class="node" onClick="{{w.go}}" style="background: #221C14; color: #E8D2B0; border: 1px solid #4A3A22; margin-bottom: 4px"><span class="warn" aria-hidden="true">!</span>{{w.label}}</button>
+      </sc-for>
+    </nav>
+
+    <main style="flex: 999 1 440px; min-width: 0; display: flex; flex-direction: column">
+      <div style="position: relative; flex: 1 1 auto; min-height: 430px; background: #0C1016; display: flex; align-items: center; justify-content: center; overflow: hidden">
+        <div style="position: absolute; top: 12px; left: 12px; right: 12px; display: flex; flex-wrap: wrap; gap: 18px; background: #161C25E6; border: 1px solid #33404E; border-radius: 8px; padding: 8px 12px">
+          <label class="cb">Thin <input type="range" min="-100" max="100" value="0" style="width: 150px; accent-color: #FF9379"> Fat</label>
+          <label class="cb">Normal <input type="range" min="0" max="100" value="0" style="width: 150px; accent-color: #FF9379"> Fit</label>
+          <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Pregnant</label>
+          <span style="flex: 1 1 auto"></span>
+          <label for="who" style="font-size: 12px; color: #ACBAC8; align-self: center">Preview on</label>
+          <select id="who" class="field" style="width: auto"><option>Young adult female</option><option>Adult female</option></select>
+          <button class="btn" type="button">Outfit…</button>
+        </div>
+        <svg width="280" height="560" viewBox="0 0 280 560" role="img" aria-label="Whole Sim preview wearing the selected recolour of the long skirt">
+          <ellipse cx="140" cy="54" rx="28" ry="34" fill="#9B7B66"></ellipse>
+          <rect x="130" y="86" width="20" height="20" fill="#9B7B66"></rect>
+          <path d="M96 110 Q140 98 184 110 L190 228 Q140 238 90 228 Z" fill="#E9E4DA"></path>
+          <path d="M96 114 L64 222 L72 226 L104 130 Z" fill="#9B7B66"></path>
+          <path d="M184 114 L216 222 L208 226 L176 130 Z" fill="#9B7B66"></path>
+          <path d="M92 222 Q140 234 188 222 L218 488 Q140 512 62 488 Z" fill="{{skirtColor}}"></path>
+          <path d="M92 222 Q140 234 188 222 L190 244 Q140 256 90 244 Z" fill="{{bandColor}}"></path>
+          <rect x="112" y="488" width="20" height="44" fill="#9B7B66"></rect>
+          <rect x="148" y="488" width="20" height="44" fill="#9B7B66"></rect>
+          <rect x="104" y="530" width="32" height="14" rx="5" fill="#252E3A"></rect>
+          <rect x="144" y="530" width="32" height="14" rx="5" fill="#252E3A"></rect>
+        </svg>
+        <div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: #161C25E6; border: 1px solid #33404E; border-radius: 8px; padding: 8px 12px">
+          <label for="anim" style="font-size: 12px; color: #ACBAC8">Pose</label>
+          <select id="anim" class="field" style="width: auto"><option>Standing (CAS idle)</option><option>Walk</option><option>Sit</option><option>Run</option></select>
+          <button class="btn" type="button" aria-label="Play animation">▶ Play</button>
+          <label for="scrub" style="position: absolute; width: 1px; height: 1px; overflow: hidden">Animation time</label>
+          <input id="scrub" type="range" min="0" max="100" value="0" style="flex: 1 1 200px; accent-color: #FF9379">
+        </div>
+      </div>
+
+      <section aria-labelledby="catTitle" style="border-top: 1px solid #33404E; background: #161C25; padding: 12px 16px 14px">
+        <h2 id="catTitle" style="margin: 0 0 8px; font-size: 14px; font-weight: 600">Catalog</h2>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="cn" class="key" style="font-size: 12px">Name in CAS</label>
+            <input id="cn" class="field" type="text" value="Long denim skirt">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="cr" class="key" style="font-size: 12px">Creator tag</label>
+            <input id="cr" class="field" type="text" value="[YOUR CREATOR NAME]">
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="itemTitle" style="border-top: 6px solid #11161E; background: #161C25; padding: 12px 16px 14px">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px">
+          <h2 id="itemTitle" style="margin: 0; font-size: 14px; font-weight: 600; flex: 1 1 auto">Item properties</h2>
+          <button class="btn" type="button">Advanced…</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="pt" class="key" style="font-size: 12px">Type</label>
+            <select id="pt" class="field"><option>None</option><option>Hair</option><option>Scalp</option><option>Face</option><option selected>Body</option><option>Accessory</option><option>Atlas</option><option>Body accessory</option><option>Uncategorized</option></select>
+            <label for="ct" class="key" style="font-size: 12px; margin-top: 4px">Clothing type</label>
+            <select id="ct" class="field"><optgroup label="Clothing"><option>Full body</option><option>Upper body</option><option selected>Lower body</option><option>Shoes</option><option>Gloves</option><option>Socks</option><option>Left garter</option><option>Right garter</option></optgroup><optgroup label="Accessories"><option>Necklace</option><option>Nose ring</option><option>Earrings</option><option>Left earring</option><option>Right earring</option><option>Glasses</option><option>Bracelet</option><option>Ring</option><option>Wedding ring</option><option>Armband</option></optgroup><optgroup label="Hair and face"><option>Hair</option><option>Scalp</option><option>Face</option><option>Beard</option><option>Eyebrows</option><option>Eye colour</option><option>Dental</option></optgroup><optgroup label="Makeup and marks"><option>Eyeshadow</option><option>Eyeliner</option><option>Blush</option><option>Mascara</option><option>Costume makeup</option><option>Moles</option><option>Freckles</option><option>Birthmark</option><option>Age weathering</option><option>Tattoo</option><option>Tattoo template</option></optgroup><optgroup label="Body hair"><option>Upper chest</option><option>Stomach</option><option>Lower back</option><option>Upper back</option><option>Full back</option><option>Forearms</option><option>Calves</option><option>Feet</option></optgroup><optgroup label="Pets"><option>Body</option><option>Tail</option><option>Ears</option><option>Mane</option><option>Bridle</option><option>Saddle</option><option>Pelt layer</option><option>Base pelt layer</option><option>Hooves</option><option>Horn</option><option>Blanket</option><option>Breast collar</option><option>Beard</option></optgroup></select>
+            <label for="sp" class="key" style="font-size: 12px; margin-top: 4px">Species</label>
+            <select id="sp" class="field" onChange="{{pickSpecies}}"><option>Human</option><option>Horse</option><option>Cat</option><option>Dog</option><option>Little dog</option><option>Deer</option><option>Raccoon</option><option>Large bird</option></select>
+          </div>
+          <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px">
+            <legend class="key" style="font-size: 12px; margin-bottom: 4px">Age and gender</legend>
+            <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Baby</label>
+            <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Toddler</label>
+            <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Child</label>
+            <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Teen</label>
+            <label class="cb"><input type="checkbox" checked style="width: 15px; height: 15px; accent-color: #FF9379">Young adult</label>
+            <label class="cb"><input type="checkbox" checked style="width: 15px; height: 15px; accent-color: #FF9379">Adult</label>
+            <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Elder</label>
+            <span style="display: flex; gap: 12px; margin-top: 4px">
+              <label class="cb"><input type="checkbox" checked style="width: 15px; height: 15px; accent-color: #FF9379">Female</label>
+              <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Male</label>
+            </span>
+          </fieldset>
+          <fieldset style="border: 0; margin: 0; padding: 0; grid-column: span 2">
+            <legend class="key" style="font-size: 12px; margin-bottom: 4px">Categories</legend>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px 12px">
+              <sc-for list="{{categories}}" as="c" hint-placeholder-count="16">
+                <label class="cb"><input type="checkbox" checked="{{c.on}}" onChange="{{c.toggle}}" style="width: 15px; height: 15px; accent-color: #FF9379">{{c.label}}</label>
+              </sc-for>
+            </div>
+          </fieldset>
+          <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px">
+            <legend class="key" style="font-size: 12px; margin-bottom: 4px">Flags</legend>
+            <label class="cb"><input type="checkbox" checked style="width: 15px; height: 15px; accent-color: #FF9379">Valid for maternity</label>
+            <label class="cb"><input type="checkbox" checked style="width: 15px; height: 15px; accent-color: #FF9379">Valid for random</label>
+            <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Is hat</label>
+            <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Is revealing</label>
+            <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Hidden in CAS</label>
+            <span style="display: flex; align-items: center; gap: 6px">
+              <label class="cb" style="{{spaceStyle}}"><input type="checkbox" checked="{{spaceChecked}}" disabled="{{spaceLocked}}" style="width: 15px; height: 15px; accent-color: #FF9379">Own texture space</label>
+              <button type="button" aria-label="About own texture space" title="Gives this part its own 0–1 UV space in the Sim's texture atlas instead of sharing the body layout. Costs resolution: the region is split, so each part gets fewer pixels. EA uses it on meshed accessories and beards." style="font: inherit; font-size: 11px; width: 18px; height: 18px; border-radius: 50%; border: 1px solid #4B5D72; background: transparent; color: #ACBAC8; cursor: help; padding: 0">i</button>
+            </span>
+            <span class="key" style="font-size: 12px; margin-top: 8px">Handedness</span>
+            <span style="display: flex; gap: 12px">
+              <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Left</label>
+              <label class="cb"><input type="checkbox" style="width: 15px; height: 15px; accent-color: #FF9379">Right</label>
+            </span>
+          </fieldset>
+        </div>
+      </section>
+    </main>
+
+    <aside aria-label="Properties" style="flex: 1 1 360px; padding: 12px 16px; background: #161C25; border-left: 1px solid #33404E; display: flex; flex-direction: column; gap: 6px; overflow-y: auto">
+
+      <section aria-label="Recolour" style="background: #1C2430; border: 1px solid #33404E; border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <label for="rcPick" style="font-size: 12px; color: #ACBAC8">Recolour</label>
+          <select id="rcPick" class="field" onChange="{{pickRecolour}}" style="flex: 1 1 auto; width: auto">
+            <sc-for list="{{recolourOptions}}" as="o" hint-placeholder-count="3">
+              <option value="{{o.value}}" selected="{{o.selected}}">{{o.label}}</option>
+            </sc-for>
+          </select>
+          <button class="btn" type="button" aria-label="Add a recolour">+</button>
+          <button class="btn" type="button">Duplicate</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span style="width: 72px; height: 72px; flex: 0 0 72px; border-radius: 8px; background: #0C1016; border: 1px solid #33404E; display: flex; align-items: flex-end; justify-content: center; overflow: hidden">
+            <svg width="60%" viewBox="0 0 100 120" role="img" aria-label="{{thumbAlt}}"><path d="M28 6 Q50 12 72 6 L86 116 Q50 124 14 116 Z" fill="{{skirtColor}}"></path></svg>
+          </span>
+          <span style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-size: 12px; color: #ACBAC8">Thumbnail</span>
+            <span style="display: flex; flex-wrap: wrap; gap: 6px">
+              <button class="btn" type="button">Render</button>
+              <button class="btn" type="button">Replace…</button>
+            </span>
+          </span>
+        </div>
+        <div style="display: flex; gap: 14px">
+          <label class="cb"><input type="radio" name="chn" checked style="width: 15px; height: 15px; accent-color: #FF9379">3 channels</label>
+          <label class="cb"><input type="radio" name="chn" style="width: 15px; height: 15px; accent-color: #FF9379">4 channels</label>
+        </div>
+        <sc-for list="{{channels}}" as="c" hint-placeholder-count="3">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; min-height: 30px">
+            <span style="{{c.dot}}"></span>
+            <span style="width: 76px; color: #ACBAC8">{{c.label}}</span>
+            <button type="button" class="btn" aria-label="Change {{c.label}} pattern" style="min-height: 30px; padding: 3px 9px 3px 4px"><span style="{{c.swatch}}"></span>{{c.pattern}}</button>
+          </div>
+        </sc-for>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <button class="btn" type="button">Paint channels</button>
+          <button class="btn" type="button">Patterns…</button>
+        </div>
+      </section>
+
+
+      <sc-if value="{{selRecolour}}" hint-placeholder-val="{{ false }}">
+        <h2 style="margin: 0 0 6px; font-size: 15px; font-weight: 600">Textures · {{recolourName}}</h2>
+        <details open="">
+          <summary>Textures</summary>
+          <sc-for list="{{slots}}" as="s" hint-placeholder-count="10">
+            <button type="button" class="slot" onClick="{{s.open}}" style="font: inherit; color: #F2F5F8; background: transparent; border: 0; border-top: 1px solid #252E3A; width: 100%; text-align: left; cursor: pointer">
+              <span style="display: flex; flex-direction: column; gap: 2px"><span>{{s.name}}</span><span style="font-size: 12px; color: #ACBAC8">{{s.res}}</span></span>
+              <span style="position: relative; display: block; width: 64px; height: 64px">
+                <span style="{{s.thumb}}"></span>
+                <sc-if value="{{s.shared}}" hint-placeholder-val="{{ false }}">
+                  <span style="position: absolute; right: -4px; bottom: -4px; width: 22px; height: 22px; border-radius: 6px; background: #33262A; border: 1px solid #FF9379; display: flex; align-items: center; justify-content: center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFC2AF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Shared by all recolours"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1.5 1.5"></path><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1.5-1.5"></path></svg>
+                  </span>
+                </sc-if>
+              </span>
+            </button>
+          </sc-for>
+        </details>
+      </sc-if>
+
+      <sc-if value="{{selLod}}" hint-placeholder-val="{{ false }}">
+        <h2 style="margin: 0 0 6px; font-size: 15px; font-weight: 600">{{lodName}}</h2>
+        <details open="">
+          <summary>Groups</summary>
+          <sc-for list="{{lodGroups}}" as="g" hint-placeholder-count="2">
+            <button type="button" onClick="{{g.pick}}" class="row" style="font: inherit; color: #F2F5F8; background: transparent; border: 0; border-top: 1px solid #252E3A; width: 100%; text-align: left; cursor: pointer; padding: 8px 4px">
+              <span>{{g.label}}</span><span style="color: #ACBAC8">{{g.stats}} · {{g.shader}}</span>
+            </button>
+          </sc-for>
+          <div style="padding: 8px 4px 10px"><button class="btn" type="button">+ Add group</button></div>
+        </details>
+        <sc-if value="{{isGenerated}}" hint-placeholder-val="{{ false }}">
+          <details open="">
+            <summary>Generated from High</summary>
+            <label class="cb" style="padding: 4px">Detail <input type="range" min="10" max="90" value="{{lodPct}}" style="width: 160px; accent-color: #FF9379"> {{lodPct}}%</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 4px 10px">
+              <button class="btn" type="button">Regenerate</button>
+              <button class="btn" type="button">Replace…</button>
+            </div>
+          </details>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{selGroup}}" hint-placeholder-val="{{ false }}">
+        <h2 style="margin: 0 0 6px; font-size: 15px; font-weight: 600">{{groupTitle}}</h2>
+        <details open="">
+          <summary>Mesh</summary>
+          <div class="row"><span class="key">Size</span><span>{{groupStats}}</span></div>
+          <div class="row"><span class="key">Source</span><span>{{groupSource}}</span></div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 4px 10px">
+            <button class="btn" type="button">Replace…</button>
+            <button class="btn" type="button">Edit in Blender</button>
+            <button class="btn" type="button">Export…</button>
+            <button class="btn" type="button">Delete group</button>
+          </div>
+        </details>
+        <sc-if value="{{groupIsHigh}}" hint-placeholder-val="{{ true }}">
+          <details open="">
+            <summary>Fit to body</summary>
+            <div class="row"><label class="key" for="ref">Reference</label><select id="ref" class="field"><option>afBottomSkirtLong (cloned item)</option><option>Choose another…</option></select></div>
+            <div style="display: flex; flex-direction: column; gap: 2px; padding: 2px 4px">
+              <label class="cb"><input type="checkbox" checked style="width: 15px; height: 15px; accent-color: #FF9379">Bones and weights</label>
+              <label class="cb"><input type="checkbox" checked style="width: 15px; height: 15px; accent-color: #FF9379">Fat, fit, thin and pregnancy morphs</label>
+              <label class="cb"><input type="checkbox" checked style="width: 15px; height: 15px; accent-color: #FF9379">Match seams to the body</label>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 4px 10px">
+              <button class="btn" type="button">Fit to body</button>
+              <button class="btn" type="button">Weights…</button>
+            </div>
+          </details>
+        </sc-if>
+        <sc-if value="{{groupUvWarning}}" hint-placeholder-val="{{ false }}">
+          <details open="">
+            <summary>UV layout</summary>
+            <p style="margin: 2px 4px 8px; font-size: 13px; color: #D3DCE5"><span class="warn">!</span> 1 island overlaps the body&#39;s UVs.</p>
+            <div style="padding: 0 4px 10px"><button class="btn" type="button">Show UVs</button></div>
+          </details>
+        </sc-if>
+        <details open="">
+          <summary>Material</summary>
+          <div class="row"><label class="key" for="shader">Shader</label><select id="shader" class="field"><sc-for list="{{shaderOptions}}" as="o" hint-placeholder-count="5"><option selected="{{o.selected}}">{{o.label}}</option></sc-for></select></div>
+          <sc-for list="{{shaderParams}}" as="sp" hint-placeholder-count="5">
+            <div class="row"><label class="key mono" for="{{sp.id}}">{{sp.name}}</label><input id="{{sp.id}}" class="field mono" type="text" value="[value]"></div>
+          </sc-for>
+          <div style="padding: 4px 4px 10px"><button class="btn" type="button">Add…</button></div>
+        </details>
+        <details>
+          <summary>Bones ({{groupBoneCount}})</summary>
+          <sc-for list="{{bones}}" as="b" hint-placeholder-count="6">
+            <div class="row"><span class="mono" style="color: #D6D8DC">{{b.name}}</span><span class="mono" style="color: #ACBAC8">{{b.hash}}</span></div>
+          </sc-for>
+        </details>
+      </sc-if>
+
+
+
+    </aside>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 16px; padding: 5px 12px; background: #161C25; border-top: 1px solid #33404E; font-size: 12px; color: #ACBAC8">
+    <span>Project saved</span>
+    <span>1 CAS part · 3 recolours · 3 LODs · 4 morphs</span>
+    <span style="flex: 1 1 auto"></span>
+    <span>Vulkan · [GPU]</span>
+  </div>
+
+  <sc-if value="{{targetDialog}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: #0C0D0FCC; display: flex; align-items: center; justify-content: center; padding: 24px">
+      <div role="alertdialog" aria-labelledby="tgtTitle" style="width: 460px; max-width: 100%; background: #161C25; border: 1px solid #4A3A22; border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px">
+        <h2 id="tgtTitle" style="margin: 0; font-size: 15px; font-weight: 600">Change target to {{pendingTarget}}?</h2>
+        <span style="font-size: 13px; color: #D3DCE5">These OpenTS3-only settings will be removed:</span>
+        <ul style="margin: 0; padding-left: 18px; font-size: 13px; color: #E8D2B0">
+          <li>[OpenTS3-only setting]</li>
+        </ul>
+        <div style="display: flex; justify-content: flex-end; gap: 8px">
+          <button class="btn" type="button" onClick="{{cancelTarget}}">Cancel</button>
+          <button class="btn primary" type="button" onClick="{{confirmTarget}}">Change and remove</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{slotOpen}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: #0C0D0FCC; display: flex; align-items: center; justify-content: center; padding: 24px">
+      <div role="dialog" aria-labelledby="texTitle" style="width: 620px; max-width: 100%; background: #161C25; border: 1px solid #394353; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #33404E">
+          <h2 id="texTitle" style="margin: 0; font-size: 15px; font-weight: 600; flex: 1 1 auto">{{slotName}} · {{recolourName}}</h2>
+          <button class="btn" type="button" onClick="{{closeSlot}}" aria-label="Close">✕</button>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 16px; padding: 16px">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <span style="{{slotPreview}}" role="img" aria-label="{{slotName}} preview"></span>
+            <div role="group" aria-label="Channels shown" style="display: flex; gap: 4px">
+              <sc-for list="{{viewChannels}}" as="v" hint-placeholder-count="4">
+                <button type="button" onClick="{{v.toggle}}" aria-pressed="{{v.on}}" style="{{v.style}}">{{v.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 10px">
+            <span style="font-size: 13px; color: #D3DCE5">{{slotRes}}</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px">
+              <button class="btn" type="button">Import…</button>
+              <button class="btn" type="button">Export…</button>
+              <sc-if value="{{slotBakeable}}" hint-placeholder-val="{{ false }}">
+                <button class="btn" type="button">Bake</button>
+              </sc-if>
+              <button class="btn" type="button">Clear</button>
+            </div>
+            <label class="cb" style="margin-top: 6px"><input type="checkbox" checked="{{slotShared}}" onChange="{{toggleShared}}" style="width: 16px; height: 16px; accent-color: #FF9379">Same in all recolours</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 'textures', mode: 'Shaded', recolour: 0, species: 'Human', cats: { Everyday: true, Formalwear: true, Outerwear: true }, slot: null, target: 'OpenTS3 only', pendingTarget: null, ownTex: true, partTex: false, shared: { Multiplier: true }, view: { R: true, G: true, B: true, A: true } };
+  }
+  slotWindow() {
+    const name = this.state.slot;
+    const bgs = { Overlay: 'repeating-conic-gradient(#252E3A 0% 25%, #202833 0% 50%) 0 0 / 24px 24px', Mask: 'linear-gradient(#C0392B 0 80%, #D4B13A 80% 100%)', 'Transparency map': '#FFFFFF', Multiplier: '#8B8B8B',
+      'Skin specular': '#5A5D63', 'Skin ambient': '#D6D8DC', 'Clothing specular': '#000000', 'Clothing ambient': '#FFFFFF', Logo: '#0C1016', 'Part mask': 'repeating-conic-gradient(#252E3A 0% 25%, #202833 0% 50%) 0 0 / 24px 24px' };
+    const empty = ['Overlay', 'Transparency map', 'Logo'].includes(name);
+    const v = this.state.view;
+    return {
+      slotName: name || '',
+      slotRes: empty ? 'Empty' : '1024 × 1024 · DDS',
+      slotPreview: 'width: 300px; height: 300px; max-width: 100%; border-radius: 8px; border: 1px solid #394353; background: ' + (bgs[name] || '#0C1016'),
+      slotBakeable: name === 'Multiplier',
+      slotShared: !!this.state.shared[name],
+      toggleShared: () => this.setState({ shared: { ...this.state.shared, [name]: !this.state.shared[name] } }),
+      viewChannels: ['R', 'G', 'B', 'A'].map((c) => ({
+        label: c, on: v[c] ? 'true' : 'false',
+        toggle: () => this.setState({ view: { ...v, [c]: !v[c] } }),
+        style: 'font: inherit; font-size: 12px; width: 36px; min-height: 30px; border-radius: 5px; cursor: pointer; border: 1px solid #394353; ' + (v[c] ? 'background: #4A3036; color: #FFFFFF' : 'background: transparent; color: #ACBAC8'),
+      })),
+    };
+  }
+  categoryList() {
+    // Categories follow the species, matching EA's own use (probe caspcats over all packs, 2026-10-29): horses carry
+    // Racing, Jumping and Bridle on nearly every part; other pets use Naked and Everyday; the rest are human-only.
+    const shared = ['Naked', 'Everyday'];
+    const human = ['Formalwear', 'Sleepwear', 'Swimwear', 'Athletic', 'Outerwear', 'Career', 'Martial arts', 'Aux career',
+      'Makeover', 'Singed', 'Skinny dipping towel', 'Massage', 'Child imagination', 'Special', 'Supernatural'];
+    const horse = ['Racing', 'Jumping', 'Bridle'];
+    const sp = this.state.species;
+    const list = sp === 'Human' ? shared.concat(human) : sp === 'Horse' ? shared.concat(horse) : shared;
+    return list.map((label) => ({
+      label, on: !!this.state.cats[label],
+      toggle: () => this.setState({ cats: { ...this.state.cats, [label]: !this.state.cats[label] } }),
+    }));
+  }
+  renderVals() {
+    const sel = this.state.sel;
+    const node = (key, label, note) => ({
+      label, note: note || '',
+      pick: () => this.setState({ sel: key }),
+      style: sel === key ? 'background: #33262A; color: #FFFFFF' : 'background: transparent; color: #D3DCE5',
+    });
+    const recolours = [
+      { name: 'Recolour 1', skirt: '#6B4A48', band: '#C9B48A', p: ['[pattern name]', '[pattern name]', '[pattern name]'] },
+      { name: 'Recolour 2', skirt: '#394353', band: '#8996A5', p: ['[pattern name]', '[pattern name]', '[pattern name]'] },
+      { name: 'Recolour 3', skirt: '#7A2E3A', band: '#E0C9A6', p: ['[pattern name]', '[pattern name]', '[pattern name]'] },
+    ];
+    const rc = recolours[this.state.recolour];
+    const chColors = ['#C0392B', '#D4B13A', '#B0479C'];
+    const swatch = (hex, size) => 'width: ' + size + 'px; height: ' + size + 'px; border-radius: 4px; flex: 0 0 ' + size + 'px; background: ' + hex;
+    // LODs and their mesh groups (one GEOM each). Generated LODs keep the High LOD's groups.
+    const lodDefs = [
+      { key: 'lodHigh', name: 'High LOD', pct: 0, groups: [['1,820', '3,402'], ['412', '760']] },
+      { key: 'lodMed', name: 'Medium LOD', pct: 50, groups: [['910', '1,701'], ['206', '380']] },
+      { key: 'lodLow', name: 'Low LOD', pct: 25, groups: [['455', '850'], ['103', '190']] },
+    ];
+    const shaders = ['SimSkin', 'SimSkin'];
+    const [selLodKey, selGroupIx] = sel.split('/');
+    const lodDef = lodDefs.find((l) => l.key === selLodKey) || lodDefs[0];
+    const group = selGroupIx === undefined ? null : Number(selGroupIx);
+    const thumb = (bg) => 'width: 64px; height: 64px; border-radius: 6px; border: 1px solid #394353; background: ' + bg;
+    const checker = 'repeating-conic-gradient(#252E3A 0% 25%, #202833 0% 50%) 0 0 / 16px 16px';
+    return {
+      modes: ['Shaded', 'Textured', 'Wireframe', 'Weights', 'UVs'].map((label) => ({
+        label, on: label === this.state.mode ? 'true' : 'false',
+        pick: () => this.setState({ mode: label }),
+        style: 'font: inherit; font-size: 12px; border: 0; border-radius: 5px; padding: 6px 11px; min-height: 30px; cursor: pointer; ' + (label === this.state.mode ? 'background: #4A3036; color: #FFFFFF' : 'background: transparent; color: #D3DCE5'),
+      })),
+      treeTextures: [node('textures', 'Textures', '')],
+      recolourOptions: recolours.map((r, i) => ({ value: String(i), label: r.name, selected: i === this.state.recolour })),
+      pickRecolour: (e) => this.setState({ recolour: Number(e.target.value) }),
+      treeMesh: lodDefs.flatMap((l) => {
+        const rows = [node(l.key, l.name, l.groups.length + ' groups')];
+        if (selLodKey === l.key) l.groups.forEach((g, i) => {
+          const r = node(l.key + '/' + i, 'Group ' + i, g[0]);
+          rows.push({ ...r, style: r.style + '; padding-left: 26px' });
+        });
+        return rows;
+      }),
+      selRecolour: sel === 'textures',
+      selLod: sel.startsWith('lod') && group === null,
+      selGroup: sel.startsWith('lod') && group !== null,
+      skirtColor: rc.skirt, bandColor: rc.band,
+      recolourName: rc.name,
+      channels: ['Channel 1', 'Channel 2', 'Channel 3'].map((label, i) => ({
+        label, pattern: rc.p[i], dot: swatch(chColors[i], 10), swatch: swatch(i === 0 ? rc.skirt : rc.band, 18),
+      })),
+      slots: [
+        ['Overlay', '', checker], ['Mask', '1024 × 1024', 'linear-gradient(#C0392B 0 80%, #D4B13A 80% 100%)'], ['Transparency map', '', '#FFFFFF'],
+        ['Multiplier', '1024 × 1024', '#8B8B8B'], ['Skin specular', '1024 × 1024', '#5A5D63'], ['Skin ambient', '1024 × 1024', '#D6D8DC'],
+        ['Clothing specular', '1024 × 1024', '#000000'], ['Clothing ambient', '1024 × 1024', '#FFFFFF'], ['Logo', '', '#0C1016'], ['Part mask', '1024 × 1024', checker],
+      ].map(([name, res, bg]) => ({
+        name, res, bg, thumb: thumb(bg),
+        shared: !!this.state.shared[name],
+        open: () => this.setState({ slot: name }),
+      })),
+      pickSpecies: (e) => this.setState({ species: e.target.value }),
+      categories: this.categoryList(),
+      targetOptions: ['Retail', 'Both', 'OpenTS3 only'].map((label) => ({ label, selected: label === this.state.target })),
+      pickTarget: (e) => {
+        const next = e.target.value;
+        // Leaving OpenTS3-only drops beyond-retail data: ask first.
+        if (this.state.target === 'OpenTS3 only' && next !== 'OpenTS3 only' && this.state.ownTex) this.setState({ pendingTarget: next });
+        else this.setState({ target: next });
+      },
+      targetDialog: this.state.pendingTarget !== null,
+      pendingTarget: this.state.pendingTarget || '',
+      confirmTarget: () => this.setState({ target: this.state.pendingTarget, pendingTarget: null, ownTex: false }),
+      cancelTarget: () => this.setState({ pendingTarget: null }),
+      partTexDisabled: this.state.target === 'Retail',
+      partTexOn: this.state.partTex && this.state.target !== 'Retail',
+      partTexStyle: this.state.target === 'Retail' ? 'opacity: 0.55' : '',
+      togglePartTex: () => this.setState({ partTex: !this.state.partTex }),
+      // Whole-part own texture implies (and locks on) the retail own-texture-space flag.
+      spaceChecked: this.state.partTex && this.state.target !== 'Retail',
+      spaceLocked: this.state.partTex && this.state.target !== 'Retail',
+      spaceStyle: '',
+      ownTexDisabled: this.state.target !== 'OpenTS3 only',
+      ownTexStyle: this.state.target !== 'OpenTS3 only' ? 'opacity: 0.55' : '',
+      slotOpen: this.state.slot !== null,
+      closeSlot: () => this.setState({ slot: null }),
+      ...this.slotWindow(),
+      lodName: lodDef.name, lodPct: lodDef.pct, isGenerated: lodDef.key !== 'lodHigh',
+      lodGroups: lodDef.groups.map((g, i) => ({ label: 'Group ' + i, stats: g[0] + ' vertices', shader: shaders[i], pick: () => this.setState({ sel: lodDef.key + '/' + i }) })),
+      groupTitle: group === null ? '' : lodDef.name + ' · Group ' + group,
+      groupStats: group === null ? '' : lodDef.groups[group][0] + ' vertices, ' + lodDef.groups[group][1] + ' faces',
+      groupSource: 'long_denim_skirt.obj',
+      groupIsHigh: lodDef.key === 'lodHigh',
+      groupUvWarning: lodDef.key === 'lodHigh' && group === 0,
+      groupBoneCount: group === 1 ? 6 : 14,
+      shaderOptions: ['SimSkin', 'SimHair', 'SimGlass', 'SimEyes', 'SimEyelashes'].map((label) => ({ label, selected: label === (group === null ? 'SimSkin' : shaders[group]) })),
+      shaderParams: ['reflectivity', 'Transparency', 'Ambient', 'Emission', 'Reflective'].map((name, i) => ({ name, id: 'sp' + i })),
+      bones: [['b__ROOT_bind__', '0x57884BB9'], ['b__Pelvis__', '0x556B181A'], ['b__Spine0__', '0x6FA96266'], ['b__R_Thigh__', '0x83B1355C'], ['b__L_Calf__', '0x85E195D0'], ['b__R_Calf__', '0x81B330DE'], ['+ 8 more', '']].map(([name, hash]) => ({ name, hash })),
+      morphs: [['Fat', ''], ['Fit', ''], ['Thin', ''], ['Pregnant', '']].map(([name, note]) => ({ name, note })),
+      thumbAlt: rc.name + ' thumbnail',
+      warnings: [{ label: 'UV overlap · High LOD, Group 0', go: () => this.setState({ sel: 'lodHigh/0' }) }],
+    };
+  }
+}
+</script>
+</body>
+</html>

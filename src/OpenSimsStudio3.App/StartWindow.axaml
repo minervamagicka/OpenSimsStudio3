@@ -1,0 +1,84 @@
+<Window x:Class="OpenSimsStudio3.App.StartWindow"
+        xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="OpenSimsStudio³" Width="1440" Height="900" MinWidth="1060" MinHeight="740"
+        WindowStartupLocation="CenterScreen" Background="#11161E" Foreground="#F2F5F8"
+        FontSize="14" UseLayoutRounding="True">
+    <Grid Background="{StaticResource Ink}" ColumnDefinitions="224,*">
+        <!-- Rail: identity, recent projects, app pages -->
+        <Border Background="{StaticResource Rail}">
+            <DockPanel Margin="18,0,18,22" LastChildFill="False">
+                <StackPanel DockPanel.Dock="Top" Margin="0,18,0,22" Spacing="10">
+                    <Image x:Name="Logo" Width="104" Height="104" HorizontalAlignment="Center" />
+                    <TextBlock Text="OpenSimsStudio³" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" />
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Top" Spacing="2">
+                    <TextBlock Classes="eyebrow" Text="RECENT PROJECTS" Margin="10,0,0,8" />
+                    <TextBlock x:Name="NoRecents" Text="No projects yet" Foreground="{StaticResource Muted}" FontSize="13" Margin="10,0,0,0" />
+                    <StackPanel x:Name="Recents" Spacing="2" />
+                    <Button Content="Open project…" Margin="0,10,0,0" MinHeight="40" Padding="12,8" Click="OpenProject" />
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom">
+                    <Button Classes="navigation" Content="Settings" Click="ShowSettings" />
+                    <Button Classes="navigation" Content="Report a bug" Click="NotYet" />
+                    <Button Classes="navigation" Content="About" Click="NotYet" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Column="1" RowDefinitions="68,*">
+            <Grid Margin="34,0" ColumnDefinitions="*,Auto">
+                <TextBlock x:Name="PageTitle" Text="Start" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="Prototype" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+            </Grid>
+
+            <ContentControl x:Name="BrowseHost" Grid.Row="1" IsVisible="False" />
+            <Grid x:Name="HomePage" Grid.Row="1" ClipToBounds="True">
+                <!-- Hero: a random loading screen from the player's install, kept in memory only. -->
+                <Image x:Name="HeroBackdrop" Stretch="UniformToFill" Opacity="0.5" IsHitTestVisible="False">
+                    <Image.Effect><BlurEffect Radius="48" /></Image.Effect>
+                </Image>
+                <Image x:Name="HeroImage" Stretch="UniformToFill" HorizontalAlignment="Right" IsHitTestVisible="False" />
+                <Image x:Name="HeroFallback" Width="400" Height="400" HorizontalAlignment="Right" VerticalAlignment="Top"
+                       Margin="0,40,90,0" IsVisible="False" IsHitTestVisible="False" />
+                <Rectangle IsHitTestVisible="False">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                            <GradientStop Color="#FF11161E" Offset="0" /><GradientStop Color="#FF11161E" Offset="0.3" />
+                            <GradientStop Color="#6511161E" Offset="0.62" /><GradientStop Color="#0011161E" Offset="1" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle IsHitTestVisible="False">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                            <GradientStop Color="#0011161E" Offset="0" /><GradientStop Color="#1511161E" Offset="0.45" />
+                            <GradientStop Color="#FF11161E" Offset="1" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <StackPanel VerticalAlignment="Bottom" Margin="42,0,42,36" MaxWidth="980" HorizontalAlignment="Left" Spacing="18">
+                    <TextBlock Classes="eyebrow" Text="NEW PROJECT" Foreground="{StaticResource Coral}" />
+                    <TextBlock Text="What are you making?" FontSize="44" FontWeight="Bold" />
+                    <UniformGrid Columns="3" ColumnSpacing="12">
+                        <Button Classes="card" Click="CloneGameItem">
+                            <StackPanel Spacing="14"><Border Classes="cardIcon"><TextBlock Text="+" /></Border>
+                                <TextBlock Text="Clone a game item" FontSize="16" FontWeight="SemiBold" /></StackPanel>
+                        </Button>
+                        <Button Classes="card" Click="CloneExistingPackage">
+                            <StackPanel Spacing="14"><Border Classes="cardIcon"><TextBlock Text="⧉" /></Border>
+                                <TextBlock Text="Clone an existing package" FontSize="16" FontWeight="SemiBold" /></StackPanel>
+                        </Button>
+                        <Button Classes="card" Click="DefaultReplacement">
+                            <StackPanel Spacing="14"><Border Classes="cardIcon"><TextBlock Text="⇄" /></Border>
+                                <TextBlock Text="Default replacement" FontSize="16" FontWeight="SemiBold" /></StackPanel>
+                        </Button>
+                    </UniformGrid>
+                    <WrapPanel x:Name="Found" ItemSpacing="8" LineSpacing="8">
+                        <TextBlock Classes="eyebrow" Text="FOUND" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    </WrapPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

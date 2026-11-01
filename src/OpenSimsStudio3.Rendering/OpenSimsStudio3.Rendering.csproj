@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!-- The 3D viewport renderer: Vulkan through Silk.NET. -->
+    <ItemGroup>
+        <PackageReference Include="Silk.NET.Vulkan" Version="2.22.0" />
+        <PackageReference Include="Silk.NET.Shaderc" Version="2.22.0" />
+        <PackageReference Include="Silk.NET.Shaderc.Native" Version="2.22.0" />
+        <ProjectReference Include="../OpenSimsStudio3.Formats/OpenSimsStudio3.Formats.csproj" />
+    </ItemGroup>
+</Project>

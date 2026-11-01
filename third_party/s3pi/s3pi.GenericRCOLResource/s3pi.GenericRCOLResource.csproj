@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>s3pi.GenericRCOLResource</AssemblyName>
+    <RootNamespace>s3pi.GenericRCOLResource</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../System.Custom/System.Custom.csproj" />
+    <ProjectReference Include="../s3pi.Interfaces/s3pi.Interfaces.csproj" />
+    <ProjectReference Include="../s3pi.Settings/s3pi.Settings.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Upstream: EmbeddedResource Properties/Resources.resx (auto-included by the SDK); RCOLResources.txt is Content. -->
+    <None Include="RCOLResources.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

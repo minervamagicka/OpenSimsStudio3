@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>s3pi.Settings</AssemblyName>
+    <RootNamespace>s3pi.Settings</RootNamespace>
+  </PropertyGroup>
+</Project>

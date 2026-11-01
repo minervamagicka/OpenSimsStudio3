@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>s3pi.JazzResource</AssemblyName>
+    <RootNamespace>s3pi.GenericRCOLResource</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../System.Custom/System.Custom.csproj" />
+    <ProjectReference Include="../s3pi.Interfaces/s3pi.Interfaces.csproj" />
+    <ProjectReference Include="../s3pi.Settings/s3pi.Settings.csproj" />
+    <ProjectReference Include="../s3pi.GenericRCOLResource/s3pi.GenericRCOLResource.csproj" />
+  </ItemGroup>
+</Project>

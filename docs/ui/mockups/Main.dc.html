@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OpenSimsStudio³ · Start</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0;background:#11161E}
+a{color:#FFAF99}a:hover{color:#FFC2AF}
+.btn{font:inherit;font-size:13px;color:#F2F5F8;background:#252E3A;border:1px solid #394353;border-radius:6px;padding:8px 14px;min-height:36px;box-sizing:border-box;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:#2B3543;color:#FFFFFF}
+.primary{background:#FF9379;border-color:#FF9379;color:#11161E;font-weight:600}
+.primary:hover{background:#FFAF99;color:#11161E}
+.menu{font:inherit;font-size:13px;color:#D3DCE5;background:transparent;border:0;padding:6px 10px;border-radius:4px;cursor:pointer}
+.menu:hover{background:#252E3A;color:#FFFFFF}
+.recent{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:6px;color:#F2F5F8;text-decoration:none;min-height:46px;box-sizing:border-box}
+.recent:hover{background:#252E3A;color:#FFFFFF}
+.nav{position:relative;display:flex;align-items:center;font:inherit;font-size:14px;color:#ACBAC8;background:transparent;border:0;border-radius:6px;padding:0 18px;height:44px;width:100%;text-align:left;cursor:pointer;text-decoration:none;box-sizing:border-box}
+.nav:hover{background:#252E3A}
+.nav.on{color:#F2F5F8;font-weight:600}
+.nav.on::before{content:"";position:absolute;left:0;top:12px;width:3px;height:20px;background:#FF9379}
+.eyebrow{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#ACBAC8}
+.bigprimary{font:inherit;font-size:18px;font-weight:600;color:#11161E;background:#FF9379;border:0;border-radius:6px;min-height:60px;padding:0 28px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+.bigprimary:hover{background:#FFAF99}
+.tree{font:inherit;font-size:13px;text-align:left;border:0;border-radius:5px;padding:7px 10px;min-height:34px;cursor:pointer;width:100%}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; font-size: 14px; color: #F2F5F8; background: #11161E; min-height: max(900px, 100vh); display: flex">
+
+  <nav aria-label="OpenSimsStudio³" style="flex: 0 0 224px; background: #161C25; padding: 0 18px 22px; box-sizing: border-box; display: flex; flex-direction: column">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 0 22px">
+      <img src="oss3_icon.png" alt="" width="104" height="104" style="display: block">
+      <span style="font-weight: 700; font-size: 17px">OpenSimsStudio³</span>
+    </div>
+    <span class="eyebrow" style="margin: 0 0 8px 10px">Recent projects</span>
+    <a class="recent" href="Editor.dc.html">
+      <span style="width: 32px; height: 32px; border-radius: 6px; background: #252E3A; flex: 0 0 32px"></span>
+      <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13px">Long denim skirt</span><span style="font-size: 12px; color: #ACBAC8">Clothing · today</span></span>
+    </a>
+    <a class="recent" href="Editor.dc.html">
+      <span style="width: 32px; height: 32px; border-radius: 6px; background: #252E3A; flex: 0 0 32px"></span>
+      <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13px">[Recent project]</span><span style="font-size: 12px; color: #ACBAC8">Hair · default replacement</span></span>
+    </a>
+    <a class="recent" href="Editor.dc.html">
+      <span style="width: 32px; height: 32px; border-radius: 6px; background: #252E3A; flex: 0 0 32px"></span>
+      <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 13px">[Recent project]</span><span style="font-size: 12px; color: #ACBAC8">Skin tone</span></span>
+    </a>
+    <button class="btn" type="button" style="margin-top: 8px; justify-content: center">Open project…</button>
+    <span style="flex: 1 1 auto"></span>
+    <button type="button" class="nav">Settings</button>
+    <button type="button" class="nav">Report a bug</button>
+    <button type="button" class="nav">About</button>
+  </nav>
+
+  <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column">
+  <header style="height: 68px; flex: 0 0 68px; display: flex; align-items: center; gap: 12px; padding: 0 34px">
+    <span style="font-size: 16px; font-weight: 600; flex: 1 1 auto">{{pageTitle}}</span>
+    <span style="font-size: 12px; font-weight: 600">Prototype</span>
+  </header>
+
+  <sc-if value="{{onHome}}" hint-placeholder-val="{{ true }}">
+    <div style="flex: 1 1 auto; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 34px 42px 36px">
+      <div role="img" aria-label="Random loading screen from your game install" style="position: absolute; right: 0; top: 0; bottom: 0; width: 78%; background: repeating-linear-gradient(135deg, #1A222D 0 18px, #18202A 18px 36px); display: flex; align-items: center; justify-content: center">
+        <span style="font-size: 13px; color: #8996A5; text-align: center; line-height: 1.6">[Random TS3 loading screen, 1024 × 768]<br>read from the player's install at launch</span>
+      </div>
+      <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(90deg, #11161E 0%, #11161E 30%, rgba(17,22,30,0.4) 62%, rgba(17,22,30,0) 100%), linear-gradient(180deg, rgba(17,22,30,0) 0%, rgba(17,22,30,0.1) 45%, #11161E 100%); pointer-events: none"></div>
+      <div style="position: relative; display: flex; flex-direction: column; gap: 18px; max-width: 980px">
+        <span class="eyebrow" style="color: #FF9379">New project</span>
+        <h1 style="margin: 0; font-size: 44px; font-weight: 700; line-height: 1.1">What are you making?</h1>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+          <sc-for list="{{starts}}" as="s" hint-placeholder-count="3">
+            <button type="button" onClick="{{s.go}}" style="font: inherit; color: #F2F5F8; text-align: left; display: flex; flex-direction: column; gap: 14px; padding: 18px; min-height: 128px; background: rgba(32,40,51,0.92); border: 1px solid #33404E; border-radius: 6px; cursor: pointer">
+              <span style="width: 40px; height: 40px; border-radius: 8px; background: #33262A; color: #FFAF99; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px">{{s.icon}}</span>
+              <span style="font-size: 16px; font-weight: 600">{{s.title}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+          <span class="eyebrow" style="margin-right: 4px">Found</span>
+          <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 12px; padding: 4px 10px 4px 5px; border-radius: 999px; background: #202833; border: 1px solid #33404E">
+            <span title="[Base game icon]" style="width: 22px; height: 22px; border-radius: 50%; background: #394353"></span>The Sims 3
+            <span aria-label="Installed packs" style="display: inline-flex; gap: 3px; margin-left: 2px">
+              <sc-for list="{{packs}}" as="k" hint-placeholder-count="8"><span title="{{k}}" style="width: 18px; height: 18px; border-radius: 50%; background: #2B3543; border: 1px solid #4B5D72; box-sizing: border-box"></span></sc-for>
+            </span>
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 12px; padding: 4px 10px 4px 5px; border-radius: 999px; background: #202833; border: 1px solid #33404E">OpenTS3 [version]</span>
+          <span style="font-size: 12px; padding: 6px 10px; border-radius: 999px; background: #202833; border: 1px solid #33404E">Blender [version] · GEOM Tools</span>
+          <button class="btn" type="button" style="min-height: 30px; padding: 4px 10px; font-size: 12px; background: transparent; border-color: transparent; color: #ACBAC8">Change…</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{onBrowse}}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1 1 auto; display: flex; flex-direction: column">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid #33404E; background: #161C25">
+        <button class="btn" type="button" onClick="{{back}}">← Back</button>
+        <span style="flex: 1 1 auto"></span>
+        <label for="search" style="position: absolute; width: 1px; height: 1px; overflow: hidden">Search game items</label>
+        <input id="search" type="search" value="skirt" style="font: inherit; font-size: 13px; color: #F2F5F8; background: #11161E; border: 1px solid #394353; border-radius: 6px; padding: 9px 12px; width: 280px; max-width: 100%">
+      </div>
+      <div style="flex: 1 1 auto; display: flex; flex-wrap: wrap">
+        <nav aria-label="Game item categories" style="flex: 1 1 220px; padding: 14px 10px; background: #161C25; border-right: 1px solid #33404E; display: flex; flex-direction: column; gap: 2px">
+          <sc-for list="{{cats}}" as="c" hint-placeholder-count="8">
+            <button type="button" class="tree" onClick="{{c.pick}}" style="{{c.style}}">{{c.label}}</button>
+          </sc-for>
+        </nav>
+        <main style="flex: 999 1 560px; min-width: 0; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+            <sc-for list="{{items}}" as="i" hint-placeholder-count="10">
+              <button type="button" onClick="{{i.pick}}" style="{{i.style}}">
+                <span style="aspect-ratio: 1; width: 100%; border-radius: 6px; background: #0C1016; display: flex; align-items: flex-end; justify-content: center; overflow: hidden">
+                  <svg width="55%" viewBox="0 0 100 120" aria-hidden="true"><path d="M28 6 Q50 12 72 6 L86 116 Q50 124 14 116 Z" fill="{{i.color}}"></path></svg>
+                </span>
+                <span style="font-size: 12px; text-align: left">{{i.label}}</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #ACBAC8; text-align: left">{{i.key}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </main>
+        <aside style="flex: 1 1 300px; padding: 18px; background: #161C25; border-left: 1px solid #33404E; display: flex; flex-direction: column; gap: 12px">
+          <div style="aspect-ratio: 1; border-radius: 8px; background: #0C1016; border: 1px solid #33404E; display: flex; align-items: flex-end; justify-content: center">
+            <svg width="55%" viewBox="0 0 100 120" role="img" aria-label="Selected item preview"><path d="M28 6 Q50 12 72 6 L86 116 Q50 124 14 116 Z" fill="#5A7896"></path></svg>
+          </div>
+          <span style="font-size: 15px; font-weight: 600">{{selName}}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #ACBAC8">{{selKey}}</span>
+          <span style="font-size: 13px; color: #D3DCE5">Young adult, adult · female · Everyday, Formal · 3 recolours</span>
+          <sc-if value="{{isDefault}}" hint-placeholder-val="{{ false }}">
+            <div style="border: 1px solid #4A3A22; background: #221C14; border-radius: 8px; padding: 12px; font-size: 13px; color: #E8D2B0">Default replacement · keys kept</div>
+          </sc-if>
+        </aside>
+      </div>
+      <footer style="border-top: 1px solid #33404E; padding: 16px 34px 20px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 24px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span id="targetLabel" class="eyebrow">Target</span>
+          <div role="radiogroup" aria-labelledby="targetLabel" style="display: flex; gap: 2px; background: #161C25; border: 1px solid #33404E; border-radius: 6px; padding: 3px">
+            <sc-for list="{{targets}}" as="t" hint-placeholder-count="3">
+              <button type="button" role="radio" aria-checked="{{t.on}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; flex: 1 1 240px; max-width: 360px">
+          <label for="pname" class="eyebrow">Project name</label>
+          <input id="pname" type="text" value="{{projectName}}" style="font: inherit; font-size: 14px; color: #F2F5F8; background: #1C2430; border: 1px solid #33404E; border-radius: 6px; padding: 10px 12px; min-height: 42px; box-sizing: border-box">
+        </div>
+        <span style="flex: 1 1 auto"></span>
+        <a class="bigprimary" href="Editor.dc.html" style="min-width: 250px">Create project</a>
+      </footer>
+    </div>
+  </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { screen: 'home', mode: 'clone', cat: 'Bottoms', item: 0, target: 'Retail' };
+  }
+  renderVals() {
+    const go = (mode) => () => this.setState({ screen: 'browse', mode });
+    const titles = {
+      clone: ['Clone a game item', 'Pick the item to start from. You can change everything about it in the editor.'],
+      replace: ['Make a default replacement', 'Pick the game item to replace.'],
+    };
+    const cats = ['Tops', 'Bottoms', 'Full body', 'Shoes', 'Accessories', 'Hair', 'Skin tones', 'Makeup and overlays'];
+    const names = [
+      ['Long skirt', 'afBottomSkirtLong'], ['[EA skirt]', '[CASP key]'], ['[EA skirt]', '[CASP key]'], ['[EA skirt]', '[CASP key]'], ['[EA skirt]', '[CASP key]'],
+      ['[EA skirt]', '[CASP key]'], ['[EA skirt]', '[CASP key]'], ['[EA skirt]', '[CASP key]'], ['[EA skirt]', '[CASP key]'], ['[EA skirt]', '[CASP key]'],
+    ];
+    const colors = ['#5A7896', '#7A2E3A', '#394353', '#6E6838', '#4F6E5A'];
+    const mode = this.state.mode;
+    return {
+      onHome: this.state.screen === 'home',
+      packs: ['[EP icon]', '[EP icon]', '[EP icon]', '[EP icon]', '[EP icon]', '[SP icon]', '[SP icon]', '[SP icon]'],
+      pageTitle: this.state.screen === 'home' ? 'Start' : titles[mode][0],
+      navStart: this.state.screen === 'home' ? 'nav on' : 'nav',
+      onBrowse: this.state.screen === 'browse',
+      back: () => this.setState({ screen: 'home' }),
+      starts: [
+        { icon: '+', title: 'Clone a game item', text: 'Start from an EA item and make it your own: new mesh, textures or recolours.', go: go('clone') },
+        { icon: '⧉', title: 'Clone an existing package', text: 'Start from custom content you or someone else made, with new keys.', go: () => {} },
+        { icon: '⇄', title: 'Default replacement', text: 'Replace an EA item in game, keeping its keys.', go: go('replace') },
+      ],
+      browseTitle: titles[mode][0],
+      browseHint: titles[mode][1],
+      isDefault: mode === 'replace',
+      targets: ['Retail', 'Both', 'OpenTS3 only'].map((label) => ({
+        label, on: label === this.state.target ? 'true' : 'false',
+        pick: () => this.setState({ target: label }),
+        style: 'font: inherit; font-size: 12px; border: 0; border-radius: 5px; padding: 6px 10px; min-height: 30px; cursor: pointer; flex: 1 1 0; ' + (label === this.state.target ? 'background: #4A3036; color: #FFFFFF' : 'background: transparent; color: #D3DCE5'),
+      })),
+      projectName: mode === 'replace' ? 'Long skirt (default replacement)' : 'Long denim skirt',
+      cats: cats.map((label) => ({
+        label,
+        pick: () => this.setState({ cat: label }),
+        style: label === this.state.cat ? 'background: #33262A; color: #FFFFFF' : 'background: transparent; color: #D3DCE5',
+      })),
+      items: names.map(([label, key], i) => ({
+        label, key, color: colors[i % colors.length],
+        pick: () => this.setState({ item: i }),
+        style: 'font: inherit; color: #F2F5F8; display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 8px; cursor: pointer; background: #1C2430; border: 1px solid ' + (i === this.state.item ? '#FF9379' : '#33404E'),
+      })),
+      selName: names[this.state.item][0],
+      selKey: names[this.state.item][1],
+    };
+  }
+}
+</script>
+</body>
+</html>

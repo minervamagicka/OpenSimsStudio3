@@ -1,0 +1,130 @@
+<Window x:Class="OpenSimsStudio3.App.EditorWindow"
+        xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="OpenSimsStudio³" Width="1440" Height="900" MinWidth="1100" MinHeight="740"
+        WindowStartupLocation="CenterScreen" Background="#11161E" Foreground="#F2F5F8" FontSize="14" UseLayoutRounding="True">
+    <!-- The editor (mockup Editor.dc.html): outline, viewport with catalog and item properties, inspector. -->
+    <DockPanel>
+        <Border DockPanel.Dock="Top" Background="{StaticResource Rail}" BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1">
+            <DockPanel Margin="8,2">
+                <Image x:Name="Logo" Width="20" Height="20" Margin="2,0,8,0" DockPanel.Dock="Left" />
+                <Menu DockPanel.Dock="Left" Background="Transparent">
+                    <MenuItem Header="_File">
+                        <MenuItem x:Name="SaveItem" Header="_Save" InputGesture="Ctrl+S" />
+                        <MenuItem x:Name="CloseItem" Header="_Close project" />
+                    </MenuItem>
+                    <MenuItem Header="_View">
+                        <MenuItem x:Name="ResetViewItem" Header="_Reset camera" />
+                        <Separator />
+                        <MenuItem x:Name="FrontViewItem" Header="_Front" />
+                        <MenuItem x:Name="SideViewItem" Header="_Side" />
+                        <MenuItem x:Name="CloseUpViewItem" Header="_Close-up" />
+                    </MenuItem>
+                </Menu>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <TextBlock Text="Camera" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center" />
+                    <ComboBox x:Name="CameraBox" MinHeight="34" MinWidth="110" FontSize="13" />
+                    <CheckBox x:Name="WholeSimBox" Content="Whole Sim" IsChecked="True" FontSize="13" Margin="4,0,10,0" VerticalAlignment="Center" />
+                    <TextBlock x:Name="SaveState" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center" />
+                    <Button x:Name="SaveButton" Classes="primary" Content="Save" MinHeight="34" FontSize="14" Padding="18,6" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="16,0">
+                    <TextBlock x:Name="ProjectTitle" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <Border Classes="chip" Padding="10,3"><TextBlock x:Name="TargetText" FontSize="12" /></Border>
+                    <Border Classes="chip" Padding="10,3"><TextBlock x:Name="KindText" FontSize="12" /></Border>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid ColumnDefinitions="230,*,380">
+            <!-- Outline -->
+            <Border Background="{StaticResource Rail}" BorderBrush="{StaticResource Line}" BorderThickness="0,0,1,0">
+                <ScrollViewer>
+                    <StackPanel x:Name="Outline" Margin="10,12" Spacing="2" />
+                </ScrollViewer>
+            </Border>
+
+            <!-- Viewport, catalog, item properties -->
+            <Grid Grid.Column="1" RowDefinitions="*,Auto">
+                <Grid>
+                    <ContentControl x:Name="ViewportHost" />
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="12" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <ComboBox x:Name="LodBox" MinWidth="200" MinHeight="34" />
+                    </StackPanel>
+                    <TextBlock x:Name="ViewportStatus" Margin="12" FontSize="12" Foreground="{StaticResource Muted}"
+                               HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+                    <!-- Body shape (mockup: Thin–Fat, Normal–Fit, Pregnant): the part's and the body's BGEO morphs. -->
+                    <Border Margin="12" Padding="10,4" CornerRadius="8" Background="#E01C2430" BorderBrush="{StaticResource Line}" BorderThickness="1"
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                        <Grid ColumnDefinitions="Auto,130,Auto" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="6">
+                            <TextBlock Text="Thin" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            <Slider x:Name="WeightSlider" Grid.Column="1" Minimum="-1" Maximum="1" Value="0" Height="34" MinHeight="0" Margin="0,-3" />
+                            <TextBlock Grid.Column="2" Text="Fat" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="1" Text="Normal" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            <Slider x:Name="FitSlider" Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="1" Value="0" Height="34" MinHeight="0" Margin="0,-3" />
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Fit" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center" />
+                            <TextBlock Grid.Row="2" Text="Pregnant" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            <Slider x:Name="PregnantSlider" Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1" Value="0" Height="34" MinHeight="0" Margin="0,-3" />
+                            <Button x:Name="ShapeReset" Grid.Row="2" Grid.Column="2" Content="Reset" FontSize="11" Padding="6,1" MinHeight="0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="ShapeNote" Grid.Row="3" Grid.ColumnSpan="3" FontSize="11" Foreground="{StaticResource Muted}" TextWrapping="Wrap" MaxWidth="280" IsVisible="False" />
+                        </Grid>
+                    </Border>
+                </Grid>
+                <ScrollViewer Grid.Row="1" MaxHeight="380" Background="{StaticResource Rail}">
+                    <StackPanel>
+                        <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="16,12,16,14">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Catalog" FontSize="14" FontWeight="SemiBold" />
+                                <StackPanel Orientation="Horizontal" Spacing="18">
+                                    <StackPanel Spacing="6" Width="320">
+                                        <TextBlock Classes="eyebrow" Text="INTERNAL NAME" />
+                                        <TextBox x:Name="InternalName" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <Border BorderBrush="#11161E" BorderThickness="0,6,0,0" Padding="16,12,16,14">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Item properties" FontSize="14" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="170,18,130,18,*,18,190">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Classes="eyebrow" Text="TYPE" />
+                                        <ComboBox x:Name="DataTypeBox" HorizontalAlignment="Stretch" />
+                                        <TextBlock Classes="eyebrow" Text="CLOTHING TYPE" Margin="0,4,0,0" />
+                                        <ComboBox x:Name="ClothingBox" HorizontalAlignment="Stretch" MaxDropDownHeight="420" />
+                                        <TextBlock Classes="eyebrow" Text="SPECIES" Margin="0,4,0,0" />
+                                        <ComboBox x:Name="SpeciesBox" HorizontalAlignment="Stretch" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Spacing="3">
+                                        <TextBlock Classes="eyebrow" Text="AGE AND GENDER" Margin="0,0,0,3" />
+                                        <StackPanel x:Name="Ages" Spacing="3" />
+                                        <StackPanel x:Name="Genders" Orientation="Horizontal" Spacing="12" Margin="0,6,0,0" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="4" Spacing="3">
+                                        <TextBlock Classes="eyebrow" Text="CATEGORIES" Margin="0,0,0,3" />
+                                        <UniformGrid x:Name="Categories" Columns="2" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="6" Spacing="3">
+                                        <TextBlock Classes="eyebrow" Text="FLAGS" Margin="0,0,0,3" />
+                                        <StackPanel x:Name="Flags" Spacing="3" />
+                                        <TextBlock Classes="eyebrow" Text="HANDEDNESS" Margin="0,8,0,3" />
+                                        <StackPanel x:Name="Handedness" Orientation="Horizontal" Spacing="12" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- Inspector for the outline selection -->
+            <Border Grid.Column="2" Background="{StaticResource Rail}" BorderBrush="{StaticResource Line}" BorderThickness="1,0,0,0">
+                <ScrollViewer>
+                    <StackPanel Margin="14,12" Spacing="12">
+                        <ContentControl x:Name="RecolourHost" />
+                        <StackPanel x:Name="Inspector" Spacing="10" Margin="2,0" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>
