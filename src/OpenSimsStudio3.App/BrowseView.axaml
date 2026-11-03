@@ -62,7 +62,7 @@
                 </StackPanel>
                 <StackPanel Grid.Column="4" Spacing="6">
                     <TextBlock x:Name="CreateStatus" FontSize="12" Foreground="{StaticResource Muted}" HorizontalAlignment="Right" />
-                    <Button x:Name="CreateButton" Classes="primary" Content="Create project" IsEnabled="False" />
+                    <Button x:Name="CreateButton" Classes="primary main" Content="Create project" IsEnabled="False" />
                 </StackPanel>
             </Grid>
         </Border>

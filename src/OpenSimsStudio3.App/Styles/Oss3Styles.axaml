@@ -33,8 +33,9 @@
     </Styles.Resources>
 
     <!-- Text -->
+    <!-- Section labels: 10 px semibold in Muted. Avalonia has no text-transform, so callers write the text in capitals. -->
     <Style Selector="TextBlock.eyebrow">
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontSize" Value="10" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="LetterSpacing" Value="0.6" />
         <Setter Property="Foreground" Value="{StaticResource Muted}" />
@@ -76,7 +77,7 @@
         <Setter Property="Foreground" Value="{StaticResource OnCoral}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="MinHeight" Value="44" />
         <Setter Property="Padding" Value="20,8" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
     </Style>
@@ -96,6 +97,15 @@
         <Setter Property="Background" Value="{StaticResource CoralOff}" />
         <Setter Property="Foreground" Value="{StaticResource Disabled}" />
         <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <!-- The page's main action (Create project): a larger primary button, as the boards' "bigprimary". -->
+    <Style Selector="Button.primary.main">
+        <Setter Property="MinHeight" Value="60" />
+        <Setter Property="Padding" Value="28,0" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
     <!-- Navigation: flat, left-aligned rows (start-screen rail, editor outline); selected row gets a coral bar. -->
