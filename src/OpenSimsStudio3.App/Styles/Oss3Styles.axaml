@@ -2,24 +2,34 @@
     <!-- OSS3's dark, launcher-like look, written for this app. Loaded after FluentTheme (Program/App.Initialize), so
          equal-specificity rules here win over Fluent's. -->
     <Styles.Resources>
-        <!-- Palette. Ink: window background; Rail: side panels; Line: hairline borders; Muted: secondary text. -->
+        <!-- Palette, as listed in docs/ui/DESIGN.md (Visual style). Ink: window background; Rail: side panels;
+             Surface: cards and panels; Input: text boxes and combo boxes; Line: hairline borders. -->
         <SolidColorBrush x:Key="Ink" Color="#11161E" />
-        <SolidColorBrush x:Key="Rail" Color="#0E1319" />
-        <SolidColorBrush x:Key="Line" Color="#26303C" />
-        <SolidColorBrush x:Key="Muted" Color="#8C98A8" />
-        <SolidColorBrush x:Key="Coral" Color="#FF8F70" />
-        <SolidColorBrush x:Key="Warn" Color="#F2B84B" />
-        <!-- Shared by the rules below. -->
-        <SolidColorBrush x:Key="Surface" Color="#1A222D" />
-        <SolidColorBrush x:Key="SurfaceHover" Color="#232E3B" />
-        <SolidColorBrush x:Key="Edge" Color="#33404E" />
+        <SolidColorBrush x:Key="Rail" Color="#161C25" />
+        <SolidColorBrush x:Key="Surface" Color="#202833" />
+        <SolidColorBrush x:Key="Input" Color="#1C2430" />
+        <SolidColorBrush x:Key="Line" Color="#33404E" />
+        <SolidColorBrush x:Key="Text" Color="#F2F5F8" />
+        <SolidColorBrush x:Key="Muted" Color="#ACBAC8" />
+        <SolidColorBrush x:Key="Disabled" Color="#8996A5" />
+        <SolidColorBrush x:Key="Coral" Color="#FF9379" />
+        <SolidColorBrush x:Key="OnCoral" Color="#11161E" />
+        <SolidColorBrush x:Key="CoralHover" Color="#FFAF99" />
+        <SolidColorBrush x:Key="CoralPressed" Color="#EB816A" />
+        <SolidColorBrush x:Key="Selected" Color="#252E3A" />
+        <SolidColorBrush x:Key="Success" Color="#A8DBB8" />
+        <SolidColorBrush x:Key="Warn" Color="#F2C46D" />
+        <SolidColorBrush x:Key="Danger" Color="#FF8F8F" />
+        <SolidColorBrush x:Key="DangerBack" Color="#6B3A40" />
+        <!-- Not in DESIGN.md's list; taken from the mockup boards (docs/ui/mockups). -->
+        <SolidColorBrush x:Key="NavText" Color="#D3DCE5" />
+        <SolidColorBrush x:Key="SurfaceHover" Color="#2B3543" />
+        <SolidColorBrush x:Key="Edge" Color="#394353" />
         <SolidColorBrush x:Key="EdgeHover" Color="#4B5D72" />
-        <SolidColorBrush x:Key="Selected" Color="#1E2733" />
-        <SolidColorBrush x:Key="OnCoral" Color="#1B0F0B" />
-        <SolidColorBrush x:Key="CoralHover" Color="#FFA78E" />
-        <SolidColorBrush x:Key="CoralPressed" Color="#E57A5B" />
+        <SolidColorBrush x:Key="CoralTint" Color="#33262A" />
+        <SolidColorBrush x:Key="CardFace" Color="#EB202833" />
+        <!-- Not in DESIGN.md or the boards: a disabled primary button. -->
         <SolidColorBrush x:Key="CoralOff" Color="#3B2A26" />
-        <SolidColorBrush x:Key="CoralTint" Color="#3A2623" />
     </Styles.Resources>
 
     <!-- Text -->
@@ -47,8 +57,8 @@
     </Style>
     <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{StaticResource Muted}" />
-        <Setter Property="Opacity" Value="0.6" />
+        <Setter Property="Foreground" Value="{StaticResource Disabled}" />
+        <Setter Property="Opacity" Value="1" />
     </Style>
 
     <!-- Selected choice (the target buttons): coral outline. -->
@@ -84,7 +94,7 @@
     </Style>
     <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{StaticResource CoralOff}" />
-        <Setter Property="Foreground" Value="{StaticResource Muted}" />
+        <Setter Property="Foreground" Value="{StaticResource Disabled}" />
         <Setter Property="Opacity" Value="1" />
     </Style>
 
@@ -95,7 +105,7 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="MinHeight" Value="44" />
         <Setter Property="Padding" Value="19,6" />
-        <Setter Property="Foreground" Value="#C9D2DC" />
+        <Setter Property="Foreground" Value="{StaticResource NavText}" />
     </Style>
     <Style Selector="Button.navigation /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
@@ -122,8 +132,8 @@
         <Setter Property="CornerRadius" Value="6" />
     </Style>
     <Style Selector="Button.card /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="#E61A222D" />
-        <Setter Property="BorderBrush" Value="#2E3A48" />
+        <Setter Property="Background" Value="{StaticResource CardFace}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Line}" />
     </Style>
     <Style Selector="Button.card:pointerover /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{StaticResource SurfaceHover}" />
@@ -146,8 +156,8 @@
     <!-- Chips: small pills on the start screen's Found strip and the editor's header. -->
     <Style Selector="Border.chip">
         <Setter Property="CornerRadius" Value="16" />
-        <Setter Property="Background" Value="#161C25" />
-        <Setter Property="BorderBrush" Value="#2E3A48" />
+        <Setter Property="Background" Value="{StaticResource Rail}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Line}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="10,4" />
     </Style>
@@ -176,7 +186,7 @@
         <Setter Property="Padding" Value="14,9" />
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Foreground" Value="#C9D2DC" />
+        <Setter Property="Foreground" Value="{StaticResource NavText}" />
     </Style>
     <Style Selector="ListBox.rail > ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -185,7 +195,7 @@
         <Setter Property="Background" Value="{StaticResource Selected}" />
         <Setter Property="BorderBrush" Value="{StaticResource Coral}" />
         <Setter Property="BorderThickness" Value="3,0,0,0" />
-        <Setter Property="Foreground" Value="#F2F5F8" />
+        <Setter Property="Foreground" Value="{StaticResource Text}" />
     </Style>
 
     <!-- Inputs -->
@@ -193,13 +203,13 @@
         <Setter Property="MinHeight" Value="40" />
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="BorderBrush" Value="{StaticResource Line}" />
-        <Setter Property="Background" Value="#161C25" />
+        <Setter Property="Background" Value="{StaticResource Input}" />
     </Style>
     <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
-        <Setter Property="Background" Value="#161C25" />
+        <Setter Property="Background" Value="{StaticResource Input}" />
         <Setter Property="BorderBrush" Value="{StaticResource Edge}" />
     </Style>
     <Style Selector="ComboBox:pointerover /template/ Border#Background">
-        <Setter Property="Background" Value="#1A222D" />
+        <Setter Property="Background" Value="{StaticResource Surface}" />
     </Style>
 </Styles>

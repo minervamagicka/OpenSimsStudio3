@@ -34,7 +34,7 @@ against the boards, or against screenshots shared outside the repo.
   - **Hero:** one of the game's loading screens at random, read from the player's install at run time.
   - **Found strip:** the game with an icon per installed pack, OpenTS3 (text chip) and Blender with GEOM Tools.
 - The editor and export window keep their working layouts (with a menu bar) in the same palette.
-- The app's style sheet is `src/OpenSimsStudio3.App/Styles/Oss3Styles.axaml`. Its values are approximations, so bring them in line with this palette.
+- The app's style sheet is `src/OpenSimsStudio3.App/Styles/Oss3Styles.axaml`. Its palette matches the list above, with a few extra shades (hover, borders, nav text, card face) taken from the boards.
 
 ## Decisions
 - **Starting a project:** you choose what to do first: clone a game item, clone an existing package, or make a default replacement. Then you pick the item.
