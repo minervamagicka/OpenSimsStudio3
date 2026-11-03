@@ -36,13 +36,6 @@ public partial class EditorWindow : Window
     {
         (0x100000, "Valid for maternity"), (0x200000, "Valid for random"), (0x400000, "Is hat"), (0x800000, "Is revealing"), (0x1000000, "Hidden in CAS"),
     };
-    // Shader IDs are FNV-32 of the lower-cased name (research/undocumented-fields.md, "GEOM tangents").
-    static readonly Dictionary<uint, string> ShaderNames = new()
-    {
-        [0x84FD7152] = "SimHair", [0xFCF80CE1] = "CasSimHair", [0x548394B9] = "SimSkin", [0x05F75EF1] = "SimHorse",
-        [0xA78F71C4] = "SimPetFur", [0x93B210C6] = "SimPetFace", [0xCF8A70B4] = "SimEyes", [0x5EDA9CDE] = "SimGlass",
-    };
-
     readonly ProjectSession _session;
     RecolourPanel _recolours = null!;
     readonly OffscreenMeshRenderer _renderer = new();
@@ -383,7 +376,7 @@ public partial class EditorWindow : Window
     sealed record Warning(string Text, (int Lod, int Group)? Group = null, string? Tip = null);
 
     // Hair layers its strands over the same texture on purpose, so its UV overlaps are not warned about.
-    static bool IsHairShader(uint shader) => ShaderNames.TryGetValue(shader, out var name) && name.Contains("Hair", StringComparison.Ordinal);
+    static bool IsHairShader(uint shader) => OpenSimsStudio3.Formats.Materials.ShaderNames.ShaderName(shader)?.Contains("Hair", StringComparison.Ordinal) == true;
 
     List<Warning> Warnings()
     {
@@ -499,7 +492,6 @@ public partial class EditorWindow : Window
             ("Key", group.Key.ToString()),
             ("Vertices", group.Vertices.ToString("N0")),
             ("Triangles", group.Triangles.ToString("N0")),
-            ("Shader", ShaderNames.TryGetValue(group.Shader, out var n) ? n : $"0x{group.Shader:X8}"),
             ("Vertex colour", !group.HasVertexColour ? "none (engine default)" : group.VertexColourAllZero ? "all zero (renders black)" : "present"),
             ("Stored in", group.InProject ? "this project" : "the game"),
             ("UVs", group.UvCheck.Channels == 0 && group.UvCheck.IsClean ? "none" : group.UvCheck.IsClean
@@ -573,6 +565,18 @@ public partial class EditorWindow : Window
         Inspector.Children.Add(Muted12(blender == null
             ? "No Blender with GEOM Tools found. Choose one in Settings on the start screen."
             : $"Opens in Blender {blender.Version}. Change the default in Settings on the start screen."));
+
+        // Material: shader and MTNF parameters, edited straight into the group's GEOM.
+        var material = new MaterialPanel(_session, group.Key);
+        material.Changed += shaderChanged =>
+        {
+            UpdateSaveState();
+            if (!shaderChanged) return;
+            // The shader decides which UV warnings apply (hair), so the outline is rebuilt and the group shown again.
+            BuildOutline();
+            if (_groupEntries.TryGetValue((lod.Id, index), out var entry)) Select(entry.Entry, entry.Show);
+        };
+        Inspector.Children.Add(material);
     }
 
     readonly Dictionary<string, DateTime> _workFiles = new(StringComparer.OrdinalIgnoreCase);

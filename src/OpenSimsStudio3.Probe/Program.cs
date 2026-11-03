@@ -12,6 +12,7 @@ using OpenSimsStudio3.Rendering;
 //   roundtrip <casp|geom> <package>...    parse and rewrite every resource of a type, compare bytes
 //   uvs <package>... [--all]              run the UV checks on every GEOM; print problems and a tally per kind
 //   lodregen <package>...                 build 50/25/12.5% LODs of every GEOM; print triangles reached and time
+//   materials <package>... [--show]       read every GEOM material, check unedited and edit-then-revert writes are byte-exact
 return args.Length > 0 ? args[0] switch
 {
     "geoms" when args.Length >= 2 => Geoms(args[1], args.Length > 2 ? int.Parse(args[2]) : 10),
@@ -45,6 +46,7 @@ return args.Length > 0 ? args[0] switch
     "caspdeps" when args.Length >= 2 => CaspDeps.Run(args[1], args.Length > 2 ? int.Parse(args[2]) : 3),
     "uvs" when args.Length >= 2 => UvCheck.Run(args[1..]),
     "lodregen" when args.Length >= 2 => LodRegenCheck.Run(args[1..]),
+    "materials" when args.Length >= 2 => MaterialCheck.Run(args[1..]),
     "geomdiff" when args.Length >= 3 => Program.GeomDiff(args[1], ulong.Parse(args[2], NumberStyles.HexNumber)),
     "render" when args.Length >= 4 => Render(args[1], args[2], args[3]),
     _ => Usage(),
