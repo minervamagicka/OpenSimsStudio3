@@ -9,6 +9,14 @@ public interface IResourceSource
     byte[]? Read(ResourceKey key);
 }
 
+/// <summary>A source with nothing in it: a stand-in for the game when no install is known.</summary>
+public sealed class NoResources : IResourceSource
+{
+    public static readonly NoResources Instance = new();
+    public bool Contains(ResourceKey key) => false;
+    public byte[]? Read(ResourceKey key) => null;
+}
+
 /// <summary>
 /// A custom-content package over the game: keys the package has (live) come from it, everything else from the game,
 /// as when the game loads the package from Mods. The package is opened read-only and kept open until disposed.

@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using OpenSimsStudio3.Formats.Install;
 using OpenSimsStudio3.Formats.Projects;
 using OpenSimsStudio3.Formats.Sims3Pack;
 
@@ -12,11 +13,16 @@ namespace OpenSimsStudio3.App;
 /// <summary>
 /// The export window (DESIGN.md, Export). Exports the given projects (one, from the editor, today; the core merges
 /// several) to &lt;folder&gt;\&lt;name&gt;.package and/or .sims3pack, optionally copies the package to a test profile and
-/// clears its CAS caches after asking. The checks re-run whenever a choice changes; an error disables Export.
+/// clears its CAS caches after asking. The checks re-run whenever a choice changes; an error disables Export. The checks
+/// of the projects' content (ExportChecks.Content: flags, mesh, bones, morphs, LODs, UVs, textures) don't depend on the
+/// choices and read every mesh, so they run once, on a worker thread, when the window opens; Export waits for them.
+/// A Show link on a content check closes the window and goes to that place in the editor.
 /// </summary>
 public partial class ExportWindow : Window
 {
     readonly IReadOnlyList<string> _projects;
+    readonly Action<CheckTarget>? _showInEditor;
+    IReadOnlyList<ExportCheck>? _content;
     readonly string _name = "";
     readonly string _displayName = "";
     string _lastFolder = "";
@@ -24,10 +30,13 @@ public partial class ExportWindow : Window
 
     public ExportWindow() : this([]) { }
 
-    public ExportWindow(IReadOnlyList<string> projectFolders)
+    /// <param name="game">Where resources the projects lack are looked up (textures a clone takes from the game); null when unknown.</param>
+    /// <param name="showInEditor">Goes to a check's place in the editor (<see cref="CheckTarget.IsEditor" />); null when no editor is open.</param>
+    public ExportWindow(IReadOnlyList<string> projectFolders, IResourceSource? game = null, Action<CheckTarget>? showInEditor = null)
     {
         InitializeComponent();
         _projects = projectFolders;
+        _showInEditor = showInEditor;
         if (projectFolders.Count == 0) return;
 
         var first = TryRead(projectFolders[0]);
@@ -54,6 +63,18 @@ public partial class ExportWindow : Window
         ShowFolderButton.Click += (_, _) => Reveal(_lastFolder);
         KeyDown += (_, e) => { if (e.Key == Avalonia.Input.Key.Escape && !_busy) Close(); };
         Refresh();
+        _ = CheckContentAsync(game);
+    }
+
+    async Task CheckContentAsync(IResourceSource? game)
+    {
+        try { _content = await Task.Run(() => ExportChecks.Content(_projects, game)); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidDataException or InvalidOperationException)
+        {
+            Console.Error.WriteLine($"OSS3: content checks failed: {error}");
+            _content = [new ExportCheck(CheckSeverity.Warning, "Content checks failed: " + error.Message, CheckTarget.None)];
+        }
+        Refresh();
     }
 
     static Project? TryRead(string folder)
@@ -76,6 +97,7 @@ public partial class ExportWindow : Window
     {
         var plan = ExportChecks.Run(_projects, PackagePath);
         var checks = plan.Checks.ToList();
+        checks.AddRange(_content ?? []);
         if (!WantPackage && !WantSims3Pack) checks.Add(new ExportCheck(CheckSeverity.Error, "No format chosen", CheckTarget.None));
         TestProfilePlan? profile = null;
         if (WantCopy)
@@ -93,12 +115,13 @@ public partial class ExportWindow : Window
         CheckList.Children.Clear();
         // Problems first, then the passed checks, as one-line labels.
         foreach (var check in checks.OrderByDescending(c => c.Severity)) CheckList.Children.Add(Row(check));
+        if (_content == null) CheckList.Children.Add(new TextBlock { Text = "Checking the project…", FontSize = 13, Foreground = Brush("Muted"), Margin = new Thickness(20, 10, 0, 0) });
         var errors = checks.Count(c => c.Severity == CheckSeverity.Error);
         var warnings = checks.Count(c => c.Severity == CheckSeverity.Warning);
         Summary.Text = errors > 0 ? Count(errors, "error") + (warnings > 0 ? ", " + Count(warnings, "warning") : "")
             : warnings > 0 ? Count(warnings, "warning") : "All checks passed";
         Summary.Foreground = Brush(errors > 0 ? "Danger" : warnings > 0 ? "Warn" : "Success");
-        ExportButton.IsEnabled = errors == 0 && !_busy;
+        ExportButton.IsEnabled = errors == 0 && !_busy && _content != null;
     }
 
     static string Count(int n, string what) => $"{n} {what}{(n == 1 ? "" : "s")}";
@@ -119,19 +142,31 @@ public partial class ExportWindow : Window
             Text = mark, Width = 20, FontFamily = new FontFamily("JetBrains Mono, Consolas, monospace"), Foreground = Brush(colour),
             VerticalAlignment = VerticalAlignment.Center, [DockPanel.DockProperty] = Dock.Left,
         });
-        if (check.IsProblem && check.Target.Kind != CheckTargetKind.None)
+        if (check.IsProblem && check.Target.Kind != CheckTargetKind.None && (!check.Target.IsEditor || _showInEditor != null || check.Target.Path.Length > 0))
         {
             var show = new Button { Content = "Show", Padding = new Thickness(14, 4), Margin = new Thickness(8, 4, 0, 4), [DockPanel.DockProperty] = Dock.Right };
             show.Click += (_, _) => Show(check.Target);
             row.Children.Add(show);
         }
-        row.Children.Add(new TextBlock { Text = check.Label, FontSize = 13, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center });
+        var label = new TextBlock { Text = check.Label, FontSize = 13, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
+        if (check.Tip != null) ToolTip.SetTip(label, check.Tip);
+        row.Children.Add(label);
         return new Border { BorderBrush = Brush("Line"), BorderThickness = new Thickness(0, 1, 0, 0), Padding = new Thickness(0, 4), Child = row };
     }
 
-    /// <summary>The Show link: focuses the output or profile box, or shows the project, package or resource's package in the file manager.</summary>
+    /// <summary>
+    /// The Show link: focuses the output or profile box, or shows the project, package or resource's package in the file
+    /// manager. An editor place closes this window and goes there in the editor; without an editor it shows the project folder.
+    /// </summary>
     void Show(CheckTarget target)
     {
+        if (target.IsEditor)
+        {
+            if (_showInEditor == null) { Reveal(target.Path); return; }
+            Close();
+            _showInEditor(target);
+            return;
+        }
         switch (target.Kind)
         {
             case CheckTargetKind.OutputPath: OutputBox.Focus(); OutputBox.SelectAll(); break;

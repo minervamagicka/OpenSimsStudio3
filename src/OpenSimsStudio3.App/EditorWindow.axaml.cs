@@ -22,16 +22,7 @@ namespace OpenSimsStudio3.App;
 /// </summary>
 public partial class EditorWindow : Window
 {
-    // Outfit category bits by game name (Sims3.SimIFace.CAS.OutfitCategories; see research/undocumented-fields.md).
-    static readonly (uint Bit, string Label)[] HumanCategories =
-    {
-        (0x1, "Naked"), (0x2, "Everyday"), (0x4, "Formalwear"), (0x8, "Sleepwear"), (0x10, "Swimwear"), (0x20, "Athletic"),
-        (0x40000, "Outerwear"), (0x100, "Career"), (0x200, "Aux career"), (0x80, "Martial arts"), (0x400, "Makeover"),
-        (0x40, "Singed"), (0x800, "Skinny dip towel"), (0x8000, "Massage"), (0x10000, "Child imagination"),
-        (0x20000, "Special"), (0x80000, "Supernatural"),
-    };
-    static readonly (uint Bit, string Label)[] HorseCategories = { (0x1, "Naked"), (0x2, "Everyday"), (0x1000, "Racing"), (0x2000, "Jumping"), (0x4000, "Bridle") };
-    static readonly (uint Bit, string Label)[] PetCategories = { (0x1, "Naked"), (0x2, "Everyday") };
+    // Outfit category bits by species are in Formats (OutfitCategories), shared with the checks.
     static readonly (uint Bit, string Label)[] FlagBits =
     {
         (0x100000, "Valid for maternity"), (0x200000, "Valid for random"), (0x400000, "Is hat"), (0x800000, "Is revealing"), (0x1000000, "Hidden in CAS"),
@@ -277,13 +268,7 @@ public partial class EditorWindow : Window
         var wasLoading = _loading;
         _loading = true;
         Categories.Children.Clear();
-        var list = Part.AgeGender.Species switch
-        {
-            SpeciesType.Human or SpeciesType.None => HumanCategories,
-            SpeciesType.Horse => HorseCategories,
-            _ => PetCategories,
-        };
-        foreach (var (bit, label) in list)
+        foreach (var (bit, label) in OutfitCategories.For(Part.AgeGender.Species))
             Categories.Children.Add(Check(label, ((uint)Part.ClothingCategory & bit) != 0, on => SetCategoryBit(bit, on)));
         _loading = wasLoading;
     }
@@ -316,88 +301,98 @@ public partial class EditorWindow : Window
 
     // ---- Outline and inspector ----
 
-    // The outline's group entries, so a warning can jump to its group.
-    readonly Dictionary<(int Lod, int Group), (Button Entry, Action Show)> _groupEntries = new();
+    // The outline's entries by what they show (a recolour, a LOD, a mesh group) and its section headings, so a warning
+    // or an export check can jump to them (ShowCheck).
+    readonly Dictionary<(CheckTargetKind Kind, int A, int B), (Button Entry, Action Show)> _entries = new();
+    readonly Dictionary<CheckTargetKind, Control> _sections = new();
 
     void BuildOutline()
     {
         Outline.Children.Clear();
-        _groupEntries.Clear();
-        Section("RECOLOURS");
+        _entries.Clear();
+        _sections.Clear();
+        _sections[CheckTargetKind.Recolour] = Section("RECOLOURS");
         for (var i = 0; i < Part.Presets.Count; i++)
         {
             var index = i;
-            Entry($"Recolour {i + 1}", () => ShowRecolour(index));
+            Action show = () => ShowRecolour(index);
+            _entries[(CheckTargetKind.Recolour, i, -1)] = (Entry($"Recolour {i + 1}", show), show);
         }
         if (Part.Presets.Count == 0) Note("None");
 
-        Section("MESH");
+        _sections[CheckTargetKind.Mesh] = Section("MESH");
         foreach (var lod in _session.Lods)
         {
-            Entry($"LOD {lod.Id}  ·  {lod.Vertices:N0} v", () => ShowLodInfo(lod));
+            Action showLod = () => ShowLodInfo(lod);
+            _entries[(CheckTargetKind.Lod, lod.Id, -1)] = (Entry($"LOD {lod.Id}  ·  {lod.Vertices:N0} v", showLod), showLod);
             for (var g = 0; g < lod.Groups.Count; g++)
             {
                 var group = lod.Groups[g];
                 var index = g;
                 Action show = () => ShowGroup(lod, index, group);
-                _groupEntries[(lod.Id, g)] = (Entry($"    Group {g}  ·  {group.Vertices:N0} v", show), show);
+                _entries[(CheckTargetKind.MeshGroup, lod.Id, g)] = (Entry($"    Group {g}  ·  {group.Vertices:N0} v", show), show);
             }
         }
         if (_session.Lods.Count == 0) Note("No mesh");
 
-        Section("MORPHS");
-        foreach (var (label, index) in new[] { ("Fat", Part.BlendInfoFatIndex), ("Fit", Part.BlendInfoFitIndex), ("Thin", Part.BlendInfoThinIndex), ("Special", Part.BlendInfoSpecialIndex) })
+        _sections[CheckTargetKind.Morphs] = Section("MORPHS");
+        foreach (var morph in Enum.GetValues<BlendGeometry.Morph>())
         {
-            var key = index < Part.TGIBlocks.Count ? ResourceKey.Of(Part.TGIBlocks[index]) : default;
-            var present = key.Type != 0 && _session.Read(key) != null;
-            Outline.Children.Add(new CheckBox { Content = label, IsChecked = present, IsEnabled = false, Margin = new Thickness(10, 2), FontSize = 13 });
+            var state = PartChecks.Morph(_session, Part, morph);
+            var name = PartChecks.MorphName(morph);
+            Outline.Children.Add(new CheckBox
+            {
+                Content = char.ToUpperInvariant(name[0]) + name[1..] + (state == MorphState.Broken ? " (broken link)" : ""),
+                IsChecked = state == MorphState.Present, IsEnabled = false, Margin = new Thickness(10, 2), FontSize = 13,
+            });
         }
 
-        var warnings = Warnings();
+        // The same checks as the export window (PartChecks); each line jumps to where it applies.
+        var warnings = PartChecks.Run(_session, gameChecked: true);
         Section($"WARNINGS{(warnings.Count > 0 ? $" ({warnings.Count})" : "")}");
         if (warnings.Count == 0) Note("None");
-        var warn = (IBrush)Application.Current!.FindResource("Warn")!;
         foreach (var w in warnings)
         {
-            if (w.Group is not { } at || !_groupEntries.ContainsKey(at))
+            var brush = (IBrush)Application.Current!.FindResource(w.Severity == CheckSeverity.Error ? "Danger" : "Warn")!;
+            var jump = new Button
             {
-                Outline.Children.Add(new TextBlock { Text = "⚠ " + w.Text, Foreground = warn, FontSize = 12, Margin = new Thickness(10, 2), TextWrapping = TextWrapping.Wrap });
-                continue;
-            }
-            // Jumps to the group it applies to.
-            var jump = new Button { Content = "⚠ " + w.Text, Classes = { "navigation" }, Foreground = warn, Height = 30, MinHeight = 30, FontSize = 12, Padding = new Thickness(10, 2) };
+                Content = new TextBlock { Text = "⚠ " + w.Label, TextWrapping = TextWrapping.Wrap }, Classes = { "navigation" }, Foreground = brush,
+                MinHeight = 30, FontSize = 12, Padding = new Thickness(10, 2),
+            };
             if (w.Tip != null) ToolTip.SetTip(jump, w.Tip);
-            jump.Click += (_, _) => { if (_groupEntries.TryGetValue(at, out var entry)) Select(entry.Entry, entry.Show); };
+            var target = w.Target;
+            jump.Click += (_, _) => ShowCheck(target);
             Outline.Children.Add(jump);
         }
     }
 
-    /// <summary>One line in the warnings list; <see cref="Group" /> is the (LOD, group) it jumps to, if any.</summary>
-    sealed record Warning(string Text, (int Lod, int Group)? Group = null, string? Tip = null);
-
-    // Hair layers its strands over the same texture on purpose, so its UV overlaps are not warned about.
-    static bool IsHairShader(uint shader) => OpenSimsStudio3.Formats.Materials.ShaderNames.ShaderName(shader)?.Contains("Hair", StringComparison.Ordinal) == true;
-
-    List<Warning> Warnings()
+    /// <summary>
+    /// Goes to where a check applies: selects its recolour, LOD or mesh group in the outline, or scrolls to the item
+    /// properties, the mesh or the morphs. Used by the Warnings list and by the export window's Show.
+    /// </summary>
+    public void ShowCheck(CheckTarget target)
     {
-        var list = new List<Warning>();
-        if (((uint)Part.ClothingCategory & 0xFFFFF) == 0) list.Add(new("No outfit categories: the part shows in no CAS category."));
-        if (Part.AgeGender.Age == 0) list.Add(new("No ages ticked."));
-        if (Part.AgeGender.Gender == 0) list.Add(new("No genders ticked."));
-        foreach (var lod in _session.Lods)
-            for (var g = 0; g < lod.Groups.Count; g++)
-            {
-                var group = lod.Groups[g];
-                if (group.Vertices == 0) list.Add(new($"LOD {lod.Id} group {g}: mesh missing or unreadable.", (lod.Id, g)));
-                if (group.VertexColourAllZero) list.Add(new($"LOD {lod.Id} group {g}: vertex colour is all zero, which renders hair black.", (lod.Id, g)));
-                foreach (var issue in group.UvCheck.Warnings(IsHairShader(group.Shader)))
-                    list.Add(new($"{UvWording.Label(issue)} · LOD {lod.Id}, Group {g}", (lod.Id, g), UvWording.Tip(issue)));
-            }
-        return list;
+        if (!target.IsEditor) return;
+        var key = target.Kind switch
+        {
+            CheckTargetKind.MeshGroup => (target.Kind, target.Lod, target.Group),
+            CheckTargetKind.Lod => (target.Kind, target.Lod, -1),
+            CheckTargetKind.Recolour => (target.Kind, target.Recolour, -1),
+            _ => (CheckTargetKind.None, 0, 0),
+        };
+        if (_entries.TryGetValue(key, out var entry)) Select(entry.Entry, entry.Show);
+        else if (target.Kind == CheckTargetKind.Properties) Categories.BringIntoView();
+        else if (_sections.TryGetValue(target.Kind == CheckTargetKind.Lod || target.Kind == CheckTargetKind.MeshGroup ? CheckTargetKind.Mesh : target.Kind, out var section))
+            section.BringIntoView();
+        Activate();
     }
 
-    void Section(string title) =>
-        Outline.Children.Add(new TextBlock { Text = title, Classes = { "eyebrow" }, Margin = new Thickness(10, Outline.Children.Count == 0 ? 0 : 14, 0, 4) });
+    TextBlock Section(string title)
+    {
+        var heading = new TextBlock { Text = title, Classes = { "eyebrow" }, Margin = new Thickness(10, Outline.Children.Count == 0 ? 0 : 14, 0, 4) };
+        Outline.Children.Add(heading);
+        return heading;
+    }
 
     void Note(string text) =>
         Outline.Children.Add(new TextBlock { Text = text, FontSize = 12, Foreground = Muted, Margin = new Thickness(10, 2) });
@@ -574,7 +569,7 @@ public partial class EditorWindow : Window
             if (!shaderChanged) return;
             // The shader decides which UV warnings apply (hair), so the outline is rebuilt and the group shown again.
             BuildOutline();
-            if (_groupEntries.TryGetValue((lod.Id, index), out var entry)) Select(entry.Entry, entry.Show);
+            if (_entries.TryGetValue((CheckTargetKind.MeshGroup, lod.Id, index), out var entry)) Select(entry.Entry, entry.Show);
         };
         Inspector.Children.Add(material);
     }
@@ -624,8 +619,11 @@ public partial class EditorWindow : Window
             Save();
             if (_session.Dirty) return;
         }
-        await new ExportWindow([_session.Folder]).ShowDialog(this);
+        await new ExportWindow([_session.Folder], _session.Game, target => { if (SamePath(target.Path, _session.Folder)) ShowCheck(target); }).ShowDialog(this);
     }
+
+    static bool SamePath(string a, string b) =>
+        a.Length > 0 && string.Equals(Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase);
 
     void UpdateSaveState() => SaveState.Text = _session.Dirty ? "Unsaved changes" : SaveState.Text == "Unsaved changes" ? "" : SaveState.Text;
 

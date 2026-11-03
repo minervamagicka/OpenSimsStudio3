@@ -11,6 +11,8 @@ public sealed record MeshGroup(ResourceKey Key, int Vertices, int Triangles, uin
 {
     /// <summary>The group's UV problems (<see cref="UvAnalysis" />); <see cref="UvReport.None" /> when it couldn't be read.</summary>
     public UvReport UvCheck { get; init; } = UvReport.None;
+    /// <summary>The group's skinning (<see cref="BoneReport" />); <see cref="BoneReport.None" /> when it couldn't be read.</summary>
+    public BoneReport Bones { get; init; } = BoneReport.None;
 }
 
 /// <summary>One VPXY LOD entry (EA numbers them from 1) and its mesh groups.</summary>
@@ -206,7 +208,7 @@ public sealed class ProjectSession : IResourceSource
             var geom = new GenericRCOLResource(0, new MemoryStream(bytes)).ChunkEntries.Select(c => c.RCOLBlock).OfType<GEOM>().First();
             var colours = geom.VertexData.SelectMany(v => v.Vertex.OfType<GEOM.ColorElement>()).Select(ColourOf).ToList();
             return new MeshGroup(key, geom.VertexData.Count, geom.Faces.Count, (uint)geom.Shader, _resources.ContainsKey(key),
-                colours.Count > 0, colours.Count > 0 && colours.All(c => c == 0)) { UvCheck = CheckUvs(key, bytes) };
+                colours.Count > 0, colours.Count > 0 && colours.All(c => c == 0)) { UvCheck = CheckUvs(key, bytes), Bones = BoneReport.Of(geom) };
         }
         catch (Exception error) when (error is InvalidDataException or EndOfStreamException or System.Reflection.TargetInvocationException)
         {
