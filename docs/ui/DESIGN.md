@@ -63,6 +63,13 @@ against the boards, or against screenshots shared outside the repo.
   - Warnings: every current warning; each one jumps to where it applies.
 - **Preview outfit:** an Outfit… button on the preview. It is preview-only, not item data.
 - **The material shader is editable:** a shader dropdown and editable parameters, with an add action.
+  - Material is a section in the group inspector: a Shader dropdown (CAS shaders first, then the rest; an unknown hash
+    shows as hex), then one row per parameter (name on the left, mono; editor on the right; a 30 px × removes it).
+  - Editors by kind: one box per float (1–4), a colour swatch with a picker on colour-like Float3/Float4 values, a
+    number box for ints, and a key box with a … picker (the project's DDS textures, then keys the GEOM already uses)
+    for textures. Values are written on Enter or when the box loses focus.
+  - Add… opens a flyout: a name box that suggests known names and also takes a `0x` hash, a kind dropdown (filled in
+    for known names) and Add.
 - **A mesh's source shows only the model name.**
 - **Project target:** Retail, Both or OpenTS3 only.
   - It is picked on the start screen and shown in the editor title bar, and it can be changed later.
@@ -93,9 +100,11 @@ against the boards, or against screenshots shared outside the repo.
   - The texture window (PNG Import…/Export…, Clear, R/G/B/A view, Same in all recolours) and the link icon on shared slots.
   - The Export window (File › Export…, Ctrl+E) for the open project: checks with Show, .package and .sims3pack,
     Save to folder, the test-profile copy with cache clearing, and the Exported box with Show in folder.
+  - Material in the group inspector: Shader dropdown, typed parameter editors, remove, and Add… (`MaterialPanel`,
+    `Formats/Materials`). The mockup's plain text field per parameter is now a typed editor for each kind.
 - **Not built:**
   - Bake in the texture window, slot thumbnails, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
-  - Fit to body, shader parameters, the bones list, LOD regenerate.
+  - Fit to body, the bones list, LOD regenerate.
   - The UV overlap check against the body's UVs (the mockup's "overlaps the body's UVs"), and the viewport's UVs mode.
   - The CAS camera, pose and animation, Outfit….
   - In the Export window: the checks for flags, mesh, bones, morphs, LODs, UVs and textures (it checks projects,
