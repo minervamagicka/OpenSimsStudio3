@@ -4,16 +4,21 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using OpenSimsStudio3.Formats.Cas;
 using OpenSimsStudio3.Formats.Install;
 using OpenSimsStudio3.Formats.Projects;
+using OpenSimsStudio3.Formats.Textures;
+using OpenSimsStudio3.Formats.Thumbnails;
+using OpenSimsStudio3.Rendering;
 
 namespace OpenSimsStudio3.App;
 
 /// <summary>
 /// The editor's recolour block (mockup Editor.dc.html, right column): pick a recolour, duplicate or delete it, edit its
 /// colours (top-level "… Color" values such as hair's Root/Diffuse/Highlight/Tip, and solid-colour pattern channels),
-/// and see its textures with their size and whether every recolour shares them. Edits go straight into the CASP's
+/// and see its textures with their size and whether every recolour shares them, and its CAS thumbnail (Render, Replace…;
+/// <see cref="CasThumbnails" />). Edits go straight into the CASP's
 /// preset XML through <see cref="PresetModel" />; <see cref="Changed" /> tells the editor to refresh its save state.
 /// </summary>
 public sealed class RecolourPanel : Border
@@ -32,6 +37,13 @@ public sealed class RecolourPanel : Border
     readonly Image _preview = new() { Width = 120, Height = 120, Stretch = Stretch.Uniform };
     readonly TextBlock _previewNote = new() { FontSize = 11, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
     readonly StackPanel _previewRow;
+
+    // Thumbnail block (mockup: a 72 px tile with Render and Replace…). Built once; ShowThumbnail refreshes it.
+    readonly Image _thumbnail = new() { Width = 70, Height = 70, Stretch = Stretch.Uniform };
+    readonly Border _thumbnailFrame;
+    readonly TextBlock _thumbnailStatus = new() { FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
+    readonly Button _render = new() { Content = "Render", Padding = new Thickness(14, 4) };
+    readonly Button _replace = new() { Content = "Replace…", Padding = new Thickness(14, 4) };
 
     /// <summary>Shows the composed texture of the current recolour (or why there is none).</summary>
     public void SetPreview(Avalonia.Media.Imaging.Bitmap? image, string note)
@@ -56,12 +68,38 @@ public sealed class RecolourPanel : Border
             Background = new SolidColorBrush(Color.Parse("#0C1016")), BorderBrush = new SolidColorBrush(Color.Parse("#33404E")), BorderThickness = new Thickness(1), Child = _preview };
         _previewRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, Children = { previewFrame, _previewNote } };
 
+        _thumbnailFrame = new Border { Width = 72, Height = 72, CornerRadius = new CornerRadius(8), ClipToBounds = true,
+            Background = new SolidColorBrush(Color.Parse("#0C1016")), BorderBrush = (IBrush)Application.Current!.FindResource("Line")!, BorderThickness = new Thickness(1), Child = _thumbnail };
+        ToolTip.SetTip(_render, "Render this recolour on its mesh as the CAS thumbnail");
+        ToolTip.SetTip(_replace, "Use a PNG as the CAS thumbnail");
+        _render.Click += async (_, _) => await RenderThumbnail();
+        _replace.Click += async (_, _) => await ReplaceThumbnail();
+        var thumbnailRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal, Spacing = 12,
+            Children =
+            {
+                _thumbnailFrame,
+                new StackPanel
+                {
+                    Spacing = 6, VerticalAlignment = VerticalAlignment.Center,
+                    Children =
+                    {
+                        new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Children = { new TextBlock { Text = "Thumbnail", FontSize = 12, Foreground = Muted }, _thumbnailStatus } },
+                        new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Children = { _render, _replace } },
+                    },
+                },
+            },
+        };
+
         var duplicate = SmallButton("Duplicate", "Add a recolour copied from this one");
         var delete = SmallButton("Delete", "Remove this recolour");
         duplicate.Click += (_, _) => { Select(_session.DuplicatePreset(_index)); Changed?.Invoke(); };
         delete.Click += (_, _) =>
         {
+            var presetId = _session.Part.Presets[_index].Unknown1;
             if (!_session.DeletePreset(_index)) return;
+            CasThumbnails.Remove(_session, presetId);
             Select(Math.Min(_index, _session.Part.Presets.Count - 1));
             Changed?.Invoke();
         };
@@ -74,7 +112,7 @@ public sealed class RecolourPanel : Border
         _picker.HorizontalAlignment = HorizontalAlignment.Stretch;
         header.Children.Add(_picker);
         var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Children = { duplicate, delete } };
-        Child = new StackPanel { Spacing = 10, Children = { header, actions, _body } };
+        Child = new StackPanel { Spacing = 10, Children = { header, actions, thumbnailRow, _body } };
         Select(0);
     }
 
@@ -89,7 +127,111 @@ public sealed class RecolourPanel : Border
         _picker.SelectedIndex = _index;
         _filling = false;
         Build();
+        ShowThumbnail();
         Shown?.Invoke(_index);
+    }
+
+    // ---- Thumbnail ----
+
+    /// <summary>Shows the recolour's large thumbnail from the project (a game one for a default replacement), or none.</summary>
+    void ShowThumbnail(string? status = null, bool problem = false)
+    {
+        _thumbnailStatus.Text = status ?? "";
+        _thumbnailStatus.Foreground = problem ? Warn : Muted;
+        ToolTip.SetTip(_thumbnailStatus, null);
+        var old = _thumbnail.Source as IDisposable;
+        _thumbnail.Source = null;
+        old?.Dispose();
+        var bytes = _session.Part.Presets.Count == 0 ? null : CasThumbnails.ReadBytes(_session, _index);
+        if (bytes != null)
+            try { _thumbnail.Source = new Avalonia.Media.Imaging.Bitmap(new MemoryStream(bytes)); }
+            catch (Exception) { _thumbnailStatus.Text = "unreadable"; _thumbnailStatus.Foreground = Warn; }
+        var hasMesh = _session.Lods.Count > 0;
+        _render.IsEnabled = hasMesh && _session.Part.Presets.Count > 0;
+        ToolTip.SetTip(_render, hasMesh ? "Render this recolour on its mesh as the CAS thumbnail" : "This part has no mesh to render");
+        _replace.IsEnabled = _session.Part.Presets.Count > 0;
+    }
+
+    void ShowThumbnailProblem(string label, string detail)
+    {
+        ShowThumbnail(label, problem: true);
+        ToolTip.SetTip(_thumbnailStatus, detail);
+    }
+
+    void SetThumbnailBusy(bool busy)
+    {
+        _render.IsEnabled = !busy && _session.Lods.Count > 0;
+        _replace.IsEnabled = !busy;
+        if (busy) _thumbnailStatus.Text = "…";
+        else if (_thumbnailStatus.Text == "…") _thumbnailStatus.Text = "";
+    }
+
+    /// <summary>
+    /// Composes the recolour (as the editor's preview does), renders it on LOD 0 with a fresh offscreen renderer on a
+    /// worker thread, crops to what shows, and stores every CAS size. A recolour that can't be composed renders grey.
+    /// </summary>
+    async Task RenderThumbnail()
+    {
+        if (_session.Lods.Count == 0 || _session.Part.Presets.Count == 0) return;
+        var index = _index;
+        var xml = _session.Part.Presets[index].XmlFile.ReadToEnd();
+        var mesh = _session.Mesh(_session.Lods[0]);
+        if (mesh == null) { ShowThumbnailProblem("no mesh", "LOD 0 could not be read."); return; }
+        SetThumbnailBusy(true);
+        try
+        {
+            var (image, note) = await Task.Run(() =>
+            {
+                Formats.Compositing.CompositedTexture? texture = null;
+                string? reason;
+                try { Formats.Compositing.CasCompositor.TryComposeDiffuse(_session, xml, out texture, out reason, 1024); }
+                catch (Exception error) when (error is InvalidDataException or NotSupportedException or System.Xml.XmlException or IndexOutOfRangeException)
+                {
+                    reason = error.Message;
+                }
+                using var renderer = new OffscreenMeshRenderer();
+                var rendered = Thumbnails.RenderRecolour(renderer, mesh, texture);
+                return (ImageResize.CropToContent(rendered, ThumbnailFraming.Margin), texture == null ? reason ?? "the recolour could not be composed" : null);
+            });
+            if (index != _index || index >= _session.Part.Presets.Count) return;
+            CasThumbnails.Set(_session, index, image);
+            Changed?.Invoke();
+            if (note == null) ShowThumbnail();
+            else ShowThumbnailProblem("untextured", "Rendered without the recolour's texture: " + note);
+        }
+        catch (Exception error)
+        {
+            // Vulkan setup and readback throw their own types; any of them means no render, and the old thumbnail stays.
+            ShowThumbnailProblem("render failed", error.Message);
+        }
+        finally { SetThumbnailBusy(false); }
+    }
+
+    /// <summary>Uses a PNG (any size; fitted to each square CAS size on a transparent background) as the thumbnail.</summary>
+    async Task ReplaceThumbnail()
+    {
+        if (TopLevel.GetTopLevel(this) is not { } top || _session.Part.Presets.Count == 0) return;
+        var picked = await top.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Replace thumbnail",
+            FileTypeFilter = [new FilePickerFileType("PNG image") { Patterns = ["*.png"] }],
+        });
+        if (picked.Count == 0 || picked[0].TryGetLocalPath() is not { } path) return;
+        var index = _index;
+        SetThumbnailBusy(true);
+        try
+        {
+            var image = await Task.Run(() => PngFiles.Load(path));
+            if (index != _index || index >= _session.Part.Presets.Count) return;
+            CasThumbnails.Set(_session, index, image);
+            Changed?.Invoke();
+            ShowThumbnail();
+        }
+        catch (Exception error) when (error is InvalidDataException or IOException or ArgumentException or UnauthorizedAccessException)
+        {
+            ShowThumbnailProblem("not imported", error.Message);
+        }
+        finally { SetThumbnailBusy(false); }
     }
 
     void Build()

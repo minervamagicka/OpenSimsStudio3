@@ -125,9 +125,18 @@ against the boards, or against screenshots shared outside the repo.
     recolour textures, shared with the editor's Warnings; Show goes to the place in the editor. They run once when the
     window opens ("Checking the project…"; Export waits). Bone hashes are checked against the group's own bone list
     and its skin (BONE) resource, not against the game's rig. A broken morph link shows in the outline's Morphs list.
+  - The recolour block's thumbnail, as in the mockup: a 72 px tile, a muted "Thumbnail" label and Render / Replace…
+    (44 px buttons). A short status (render failed, untextured, not imported) appears beside the label in Warn,
+    with the detail in its tooltip.
+    - Render draws the recolour composited on LOD 0, framed from the front, with texels under half alpha cut out, on
+      a transparent background.
+    - Replace… takes a PNG of any size and fits it to each square size.
+    - Both store all three CAS sizes. Keys, sizes and sources are in `Formats/Thumbnails/README.md`; the keys are not
+      yet checked in game.
 - **Not built:**
-  - Bake in the texture window, slot thumbnails, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
-  - Fit to body, shader parameters, the bones list.
+  - Slot thumbnails, Patterns…, and the 3/4-channel toggle.
+  - The launcher (Sims3Pack) thumbnail in Advanced….
+  - Fit to body, the bones list.
   - The UV overlap check against the body's UVs (the mockup's "overlaps the body's UVs"), and the viewport's UVs mode.
   - The CAS camera, pose and animation, Outfit….
   - In the Export window: the mockup's "Thumbnails and keys" check; Compress textures and meshes (exports always

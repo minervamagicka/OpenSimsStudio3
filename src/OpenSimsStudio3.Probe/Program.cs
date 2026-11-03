@@ -29,6 +29,7 @@ return args.Length > 0 ? args[0] switch
     "clone" when args.Length >= 3 => CloneCheck.Run(args[1], args[2]),
     "newproject" when args.Length >= 3 => ProjectCheck.Run(args[1], args[2]),
     "thumbs" when args.Length >= 3 => ThumbCheck.Run(args[1], args[2..]),
+    "recolourthumbs" when args.Length >= 3 => RecolourThumbCheck.Run(args[1], args[2], args.Contains("--store")),
     "vpxy" when args.Length >= 2 => VpxyDump.Run(args[1]),
     "vpxyrt" => VpxyRoundTrip.Run(),
     "haircolor" => HairColor.Run(args[1..]),

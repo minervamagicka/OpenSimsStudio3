@@ -112,6 +112,12 @@ public sealed unsafe class OffscreenMeshRenderer : IDisposable
     public void ClearTexture() => _hasTexture = false;
 
     /// <summary>
+    /// With a texture bound, drop texels under half alpha instead of laying them over skin (rendered thumbnails show
+    /// the item alone).
+    /// </summary>
+    public bool AlphaCutout { get; set; }
+
+    /// <summary>
     /// Uploads a mesh, replacing the previous one. <paramref name="context" /> (the rest of the Sim) shares the buffers
     /// and is drawn after it, untextured and skin-tinted.
     /// </summary>
@@ -166,7 +172,7 @@ public sealed unsafe class OffscreenMeshRenderer : IDisposable
             _vk.CmdSetViewport(_commandBuffer, 0, 1, &viewport);
             var scissor = new Rect2D(new Offset2D(0, 0), new Extent2D((uint)width, (uint)height));
             _vk.CmdSetScissor(_commandBuffer, 0, 1, &scissor);
-            var push = new PushConstants { ViewProjection = viewProjection, LightDirection = new Vector4(Vector3.Normalize(lightDirection), _hasTexture ? 1 : 0) };
+            var push = new PushConstants { ViewProjection = viewProjection, LightDirection = new Vector4(Vector3.Normalize(lightDirection), _hasTexture ? (AlphaCutout ? 3 : 1) : 0) };
             var set = _descriptorSet;
             _vk.CmdBindDescriptorSets(_commandBuffer, PipelineBindPoint.Graphics, _pipelineLayout, 0, 1, &set, 0, null);
             _vk.CmdPushConstants(_commandBuffer, _pipelineLayout, ShaderStageFlags.VertexBit | ShaderStageFlags.FragmentBit, 0, (uint)sizeof(PushConstants), &push);
