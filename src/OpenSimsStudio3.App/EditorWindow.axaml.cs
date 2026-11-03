@@ -440,6 +440,56 @@ public partial class EditorWindow : Window
         LodBox.SelectedIndex = _session.Lods.ToList().IndexOf(lod);
         Inspect($"LOD {lod.Id}", ("Groups", lod.Groups.Count.ToString()), ("Vertices", lod.Vertices.ToString("N0")),
             ("Triangles", lod.Groups.Sum(g => g.Triangles).ToString("N0")));
+        if (LodRegeneration.CanRegenerate(_session, lod)) AddRegenerate(lod);
+    }
+
+    // Detail picked per LOD (share of LOD 0's triangles) while the editor is open.
+    readonly Dictionary<int, double> _lodDetail = new();
+
+    /// <summary>The board's "Generated from" block: a Detail slider and Regenerate, which asks before overwriting the LOD's groups.</summary>
+    void AddRegenerate(MeshLod lod)
+    {
+        var source = LodRegeneration.Source(_session)!;
+        Inspector.Children.Add(new TextBlock { Text = $"GENERATED FROM LOD {source.Id}", Classes = { "eyebrow" }, Margin = new Thickness(0, 10, 0, 0) });
+        var percent = 100 * (_lodDetail.TryGetValue(lod.Id, out var kept) ? kept : LodRegeneration.DefaultRatio(_session, lod));
+        var label = new TextBlock { Text = $"Detail {percent:0.#}%", FontSize = 13, VerticalAlignment = VerticalAlignment.Center, MinWidth = 90 };
+        var slider = new Slider { Minimum = 5, Maximum = 90, Value = percent, Width = 160, VerticalAlignment = VerticalAlignment.Center };
+        ToolTip.SetTip(slider, $"Share of LOD {source.Id}'s triangles");
+        slider.ValueChanged += (_, _) =>
+        {
+            _lodDetail[lod.Id] = slider.Value / 100;
+            label.Text = $"Detail {slider.Value:0.#}%";
+        };
+        var regenerate = new Button { Content = "Regenerate", Padding = new Thickness(14, 6), HorizontalAlignment = HorizontalAlignment.Left };
+        ToolTip.SetTip(regenerate, $"Makes this LOD's groups from LOD {source.Id}'s at the chosen detail. LOD {source.Id} is not changed.");
+        var status = Muted12("");
+        regenerate.Click += async (_, _) =>
+        {
+            var ratio = slider.Value / 100;
+            var groups = Math.Min(lod.Groups.Count, source.Groups.Count);
+            if (await ConfirmDialog.Ask(this, $"Regenerate LOD {lod.Id}?",
+                    $"Replaces {groups} group{(groups == 1 ? "" : "s")} of LOD {lod.Id} ({lod.Groups.Sum(g => g.Triangles):N0} triangles) " +
+                    $"with meshes made from LOD {source.Id} at {ratio:P0} detail.", "Regenerate", "Cancel") != 0) return;
+            try
+            {
+                var result = LodRegeneration.Regenerate(_session, lod.Id, ratio);
+                BuildOutline();
+                ShowLod();
+                UpdateSaveState();
+                var summary = string.Join("\n", result.Groups.Select(g =>
+                    $"Group {g.Group}: triangles {g.TrianglesBefore:N0} → {g.TrianglesAfter:N0} (LOD {source.Id}: {g.SourceTriangles:N0})."));
+                await ConfirmDialog.Ask(this, $"LOD {lod.Id} regenerated",
+                    result.Warnings.Count == 0 ? summary : summary + "\n\n" + string.Join("\n\n", result.Warnings.Select(w => "⚠ " + w)), "OK");
+                if (_session.Lods.FirstOrDefault(l => l.Id == lod.Id) is { } updated) ShowLodInfo(updated);
+            }
+            catch (Exception error) when (error is InvalidDataException or InvalidOperationException or ArgumentException)
+            {
+                status.Text = "Could not regenerate: " + error.Message;
+            }
+        };
+        Inspector.Children.Add(new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Children = { label, slider } });
+        Inspector.Children.Add(regenerate);
+        Inspector.Children.Add(status);
     }
 
     void ShowGroup(MeshLod lod, int index, MeshGroup group)

@@ -233,14 +233,14 @@ public static class MeshSimplifier
                 var ring = Neighbours(c.To);
                 foreach (var h in ring) _stamp[h]++;
                 foreach (var h in ring) PushAll(queue, h);
-                PushAll(queue, c.To);
             }
             return collapsed;
         }
 
+        /// <summary>Queues every collapse into and out of <paramref name="g" /> (its stamp just changed, so older ones are stale).</summary>
         void PushAll(PriorityQueue<Candidate, (double, int, int)> queue, int g)
         {
-            foreach (var h in Neighbours(g)) Push(queue, g, h);
+            foreach (var h in Neighbours(g)) { Push(queue, g, h); Push(queue, h, g); }
         }
 
         void Push(PriorityQueue<Candidate, (double, int, int)> queue, int from, int to)
