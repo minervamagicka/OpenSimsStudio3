@@ -59,6 +59,9 @@ against the boards, or against screenshots shared outside the repo.
 - **Left sidebar:**
   - Recolours.
   - Mesh: LODs, each expanding to its mesh groups. A group has its own mesh (Replace, Edit in Blender, Export, Delete), Fit to body, UV warnings, material and shader, and bones.
+  - A LOD other than LOD 0 has **Generated from LOD 0** in its inspector: a Detail slider (share of LOD 0's triangles,
+    5–90%; defaults 50%, 25%, 12.5% for LOD 1, 2, 3) and Regenerate, which asks before replacing the LOD's groups.
+    Group n is made from LOD 0's group n; LOD 0 is never changed (`Formats/Meshes/MeshSimplifier.cs`, `Projects/LodRegeneration.cs`).
   - Morphs: fat, fit, thin, special, each checked when present.
   - Warnings: every current warning; each one jumps to where it applies.
 - **Preview outfit:** an Outfit… button on the preview. It is preview-only, not item data.
@@ -93,9 +96,11 @@ against the boards, or against screenshots shared outside the repo.
   - The texture window (PNG Import…/Export…, Clear, R/G/B/A view, Same in all recolours) and the link icon on shared slots.
   - The Export window (File › Export…, Ctrl+E) for the open project: checks with Show, .package and .sims3pack,
     Save to folder, the test-profile copy with cache clearing, and the Exported box with Show in folder.
+  - LOD regenerate: Detail and Regenerate in the LOD inspector (confirm, then a summary with warnings). Not the board's
+    Replace… in that block, nor its "+ Add group": a LOD keeps the groups its VPXY lists.
 - **Not built:**
   - Bake in the texture window, slot thumbnails, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
-  - Fit to body, shader parameters, the bones list, LOD regenerate.
+  - Fit to body, shader parameters, the bones list.
   - The UV overlap check against the body's UVs (the mockup's "overlaps the body's UVs"), and the viewport's UVs mode.
   - The CAS camera, pose and animation, Outfit….
   - In the Export window: the checks for flags, mesh, bones, morphs, LODs, UVs and textures (it checks projects,
