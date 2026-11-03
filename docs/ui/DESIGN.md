@@ -47,6 +47,11 @@ against the boards, or against screenshots shared outside the repo.
   - Slots show only their resolution, read from the DDS; an empty slot shows nothing.
   - Clicking a slot opens a texture window: a large preview, R/G/B/A view toggles, Import…, Export…, Bake (where it applies) and Clear, plus **Same in all recolours**.
   - A shared slot shows a link icon. There are no texture buttons under the list.
+  - While Same in all recolours is ticked, Import and Clear change every recolour; ticking it points every recolour
+    at the open recolour's texture. Unticking changes nothing until the next Import or Clear, which then applies to
+    the open recolour only.
+  - Import keeps the slot's DDS format (DXT1, DXT5; DXT3 becomes DXT5; uncompressed becomes A8R8G8B8) and takes the
+    image's size, with a full mip chain. A cleared slot stays listed and shows no size.
 - **Under the preview:** Catalog (name in CAS, creator tag) and then Item properties, laid out in columns.
   - CAS items have no description field: CAS never shows one.
   - The properties use TSRW's full lists: all 9 part types; every clothing type, grouped; outfit categories filtered by species; flags (maternity, random, hat, revealing, hidden in CAS, own texture space with a tooltip; handedness).
@@ -71,13 +76,14 @@ against the boards, or against screenshots shared outside the repo.
   - Merged export of several projects into one package is planned.
 - **Wording:** no explanatory text in the UI. Labels and controls speak for themselves; explanations go in tooltips or docs. Button labels are short (Bake, Replace…, Export…, Show UVs, Add…), except Edit in Blender, which keeps its full label.
 
-## Built vs mockup (2026-11-01)
+## Built vs mockup (2026-11-03)
 - **Built:**
   - Start screen, browser and clone/default-replacement flow.
   - Editor layout, item properties, recolour block (colours, textures, live preview).
   - LOD and group outline, Edit in Blender, morph sliders, camera presets, Whole Sim, Settings page.
+  - The texture window (PNG Import…/Export…, Clear, R/G/B/A view, Same in all recolours) and the link icon on shared slots.
 - **Not built:**
-  - The texture window, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
+  - Bake in the texture window, slot thumbnails, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
   - Fit to body, UV warnings, shader parameters, the bones list, LOD regenerate.
   - The CAS camera, pose and animation, Outfit….
   - The target picker in the editor and the Export window.

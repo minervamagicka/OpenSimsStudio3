@@ -121,27 +121,66 @@ public sealed class RecolourPanel : Border
         foreach (var c in colours) _body.Children.Add(ColourRow(model, c.Label, c.Rgba, c.Channel, c.Enabled));
 
         _body.Children.Add(Eyebrow("TEXTURES"));
-        var shared = SharedTextures();
         foreach (var t in model.Textures.DistinctBy(t => t.Name).Where(t => model.IsTextureUsed(t.Name)))
         {
-            var info = TextureInfo.Read(_session.Read(t.Key));
+            var empty = RecolourTextures.IsEmpty(t.Key);
+            var info = empty ? null : TextureInfo.Read(_session.Read(t.Key));
             var row = new DockPanel { LastChildFill = true };
-            var size = new TextBlock { Text = info == null ? "missing" : $"{info.Width} × {info.Height} · {info.Format}", FontSize = 12,
-                Foreground = info == null ? Warn : Muted, VerticalAlignment = VerticalAlignment.Center };
+            var size = new TextBlock { Text = empty ? "" : info == null ? "missing" : $"{info.Width} × {info.Height} · {info.Format}", FontSize = 12,
+                Foreground = !empty && info == null ? Warn : Muted, VerticalAlignment = VerticalAlignment.Center };
             DockPanel.SetDock(size, Dock.Right);
             row.Children.Add(size);
-            if (shared.Contains(t.Name))
+            if (RecolourTextures.IsShared(_session, t.Name))
             {
-                var link = new TextBlock { Text = "🔗", FontSize = 11, Margin = new Thickness(0, 0, 6, 0), VerticalAlignment = VerticalAlignment.Center };
-                ToolTip.SetTip(link, "Shared by all recolours");
+                var link = LinkIcon();
                 DockPanel.SetDock(link, Dock.Right);
                 row.Children.Add(link);
             }
-            var name = new TextBlock { Text = t.Name, FontSize = 13, VerticalAlignment = VerticalAlignment.Center };
-            ToolTip.SetTip(name, t.Key.ToString());
-            row.Children.Add(name);
-            _body.Children.Add(row);
+            row.Children.Add(new TextBlock { Text = t.Name, FontSize = 13, VerticalAlignment = VerticalAlignment.Center });
+            var slot = new Button
+            {
+                Content = row, MinHeight = 32, Padding = new Thickness(4, 4), BorderThickness = new Thickness(0, 1, 0, 0),
+                CornerRadius = new CornerRadius(0), HorizontalAlignment = HorizontalAlignment.Stretch, HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                BorderBrush = (IBrush)Application.Current!.FindResource("Selected")!,
+            };
+            ToolTip.SetTip(slot, t.Key.ToString());
+            var name = t.Name;
+            slot.Click += async (_, _) => await OpenTexture(name);
+            _body.Children.Add(slot);
         }
+    }
+
+    async Task OpenTexture(string slot)
+    {
+        if (TopLevel.GetTopLevel(this) is not Window owner) return;
+        var window = new TextureWindow(_session, _index, slot);
+        await window.ShowDialog(owner);
+        if (!window.Edited) return;
+        Changed?.Invoke();
+        Build();
+    }
+
+    /// <summary>The shared-slot mark from the mockup: a link glyph in a coral-edged tile.</summary>
+    static Control LinkIcon()
+    {
+        Avalonia.Controls.Shapes.Path Stroke(string data) => new()
+        {
+            Data = Geometry.Parse(data), Stroke = new SolidColorBrush(Color.Parse("#FFC2AF")), StrokeThickness = 2.2,
+            StrokeLineCap = PenLineCap.Round, StrokeJoin = PenLineJoin.Round,
+        };
+        var glyph = new Viewbox
+        {
+            Width = 14, Height = 14,
+            Child = new Canvas { Width = 24, Height = 24, Children = { Stroke("M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1.5 1.5"), Stroke("M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1.5-1.5") } },
+        };
+        var tile = new Border
+        {
+            Width = 22, Height = 22, CornerRadius = new CornerRadius(6), Margin = new Thickness(0, 0, 8, 0), VerticalAlignment = VerticalAlignment.Center,
+            Background = (IBrush)Application.Current!.FindResource("CoralTint")!, BorderBrush = (IBrush)Application.Current!.FindResource("Coral")!,
+            BorderThickness = new Thickness(1), Child = glyph,
+        };
+        ToolTip.SetTip(tile, "Shared by all recolours");
+        return tile;
     }
 
     Control ColourRow(PresetModel model, string label, float[] rgba, string? channel, bool? enabled)
@@ -185,15 +224,6 @@ public sealed class RecolourPanel : Border
         row.Children.Add(hex);
         row.Children.Add(new TextBlock { Text = label, FontSize = 13, VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis });
         return row;
-    }
-
-    /// <summary>Texture slots whose key is the same in every recolour.</summary>
-    HashSet<string> SharedTextures()
-    {
-        var models = Enumerable.Range(0, _session.Part.Presets.Count).Select(i => { try { return _session.Preset(i); } catch { return null; } })
-            .Where(m => m != null).Select(m => m!.Textures.GroupBy(t => t.Name).ToDictionary(g => g.Key, g => g.First().Key)).ToList();
-        if (models.Count < 2) return [];
-        return models[0].Where(kv => models.All(m => m.TryGetValue(kv.Key, out var k) && k == kv.Value)).Select(kv => kv.Key).ToHashSet();
     }
 
     static bool Try(Action a) { try { a(); return true; } catch (KeyNotFoundException) { return false; } }
