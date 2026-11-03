@@ -79,6 +79,12 @@ picks another folder. Settings live in `%APPDATA%\OpenSimsStudio3`, projects in 
 
 ## Checking
 
+The pure-code tests need no game install and run on any OS (CI runs them on Linux for every push):
+
+```
+dotnet test tests/OpenSimsStudio3.Tests -c Release
+```
+
 `OpenSimsStudio3.Probe` runs read-only checks against a real install. The most useful:
 
 | Command | What it checks |
@@ -103,6 +109,7 @@ dotnet artifacts/bin/OpenSimsStudio3.Probe/release/OpenSimsStudio3.Probe.dll ins
 | `src/OpenSimsStudio3.Formats` | Reading and writing TS3 resources, projects, cloning, export and the compositor |
 | `src/OpenSimsStudio3.Rendering` | The Vulkan viewport renderer (Silk.NET) |
 | `src/OpenSimsStudio3.Probe` | Command-line checks |
+| `tests/OpenSimsStudio3.Tests` | Pure-code tests (xUnit) on data made for the test |
 | `third_party/s3pi` | s3pi 17-0520-1823 from its official source, as .NET 10 projects |
 | `docs/ui` | Design notes and reference boards |
 

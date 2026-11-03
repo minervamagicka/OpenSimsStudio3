@@ -16,6 +16,8 @@ boards: `docs/ui/DESIGN.md` (read it before any UI change; keep it current when 
 
 ## Building and checking
 - `dotnet build OpenSimsStudio3.sln -c Release` (.NET 10 SDK).
+- `dotnet test tests/OpenSimsStudio3.Tests -c Release`: pure-code tests, no install needed. Add tests with every
+  change to `Formats`, using data the test builds (see `TestDds`, `TestPackages`).
 - The app and the `OpenSimsStudio3.Probe` checks need a Windows install of The Sims 3. Without one (e.g. in a cloud
   session), build and run pure-code checks only, and say in the PR which in-game or install checks are still owed.
 - The maintainer pulls branches and runs the app and probes on Windows, then reports back. When you hand over a branch,
