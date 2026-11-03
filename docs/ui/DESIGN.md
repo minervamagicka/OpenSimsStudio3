@@ -47,6 +47,11 @@ against the boards, or against screenshots shared outside the repo.
   - Slots show only their resolution, read from the DDS; an empty slot shows nothing.
   - Clicking a slot opens a texture window: a large preview, R/G/B/A view toggles, Import…, Export…, Bake (where it applies) and Clear, plus **Same in all recolours**.
   - A shared slot shows a link icon. There are no texture buttons under the list.
+  - While Same in all recolours is ticked, Import and Clear change every recolour; ticking it points every recolour
+    at the open recolour's texture. Unticking changes nothing until the next Import or Clear, which then applies to
+    the open recolour only.
+  - Import keeps the slot's DDS format (DXT1, DXT5; DXT3 becomes DXT5; uncompressed becomes A8R8G8B8) and takes the
+    image's size, with a full mip chain. A cleared slot stays listed and shows no size.
 - **Under the preview:** Catalog (name in CAS, creator tag) and then Item properties, laid out in columns.
   - CAS items have no description field: CAS never shows one.
   - The properties use TSRW's full lists: all 9 part types; every clothing type, grouped; outfit categories filtered by species; flags (maternity, random, hat, revealing, hidden in CAS, own texture space with a tooltip; handedness).
@@ -83,8 +88,9 @@ against the boards, or against screenshots shared outside the repo.
     OpenTS3 only never asks.
   - About (a start-screen page) and Report a bug (opens a new GitHub issue with the version and OS filled in).
   - UV warnings: one line per problem in Warnings, jumping to its group (tooltip with counts); a UVs row and Show UVs in the group inspector. Show UVs is a separate window (the group's wireframe in the 0–1 square, overlaps in Danger, other problems in Warn), not the mockup's collapsible UV layout section or the viewport's UVs mode.
+  - The texture window (PNG Import…/Export…, Clear, R/G/B/A view, Same in all recolours) and the link icon on shared slots.
 - **Not built:**
-  - The texture window, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
+  - Bake in the texture window, slot thumbnails, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
   - Fit to body, shader parameters, the bones list, LOD regenerate.
   - The UV overlap check against the body's UVs (the mockup's "overlaps the body's UVs"), and the viewport's UVs mode.
   - The CAS camera, pose and animation, Outfit….

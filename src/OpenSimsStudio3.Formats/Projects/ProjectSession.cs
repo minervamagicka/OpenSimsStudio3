@@ -110,6 +110,15 @@ public sealed class ProjectSession : IResourceSource
         Project = Project.WriteTarget(Folder, target);
     }
 
+    /// <summary>Takes a resource out of the project (not the CASP); false when the package doesn't hold it.</summary>
+    public bool Remove(ResourceKey key)
+    {
+        if (key == CaspKey || !_resources.Remove(key)) return false;
+        _replaced = true;
+        if (key.Type is Vpxy or Geom) ReadLods();
+        return true;
+    }
+
     /// <summary>The recolour's preset XML as an editable model.</summary>
     public Cas.PresetModel Preset(int index) => Cas.PresetModel.Parse(Part.Presets[index].XmlFile.ReadToEnd());
 
