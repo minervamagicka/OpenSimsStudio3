@@ -10,6 +10,7 @@ using OpenSimsStudio3.Rendering;
 //   geoms <package> [show]                 load every GEOM and report what parsed
 //   render <package> <instance|first> <out.bmp>  render one GEOM offscreen with Vulkan
 //   roundtrip <casp|geom> <package>...    parse and rewrite every resource of a type, compare bytes
+//   uvs <package>... [--all]              run the UV checks on every GEOM; print problems and a tally per kind
 return args.Length > 0 ? args[0] switch
 {
     "geoms" when args.Length >= 2 => Geoms(args[1], args.Length > 2 ? int.Parse(args[2]) : 10),
@@ -40,6 +41,7 @@ return args.Length > 0 ? args[0] switch
     "bgeo" when args.Length >= 2 => BgeoCheck.Run(args[1..]),
     "nudes" => NudeParts.Run(),
     "caspdeps" when args.Length >= 2 => CaspDeps.Run(args[1], args.Length > 2 ? int.Parse(args[2]) : 3),
+    "uvs" when args.Length >= 2 => UvCheck.Run(args[1..]),
     "geomdiff" when args.Length >= 3 => Program.GeomDiff(args[1], ulong.Parse(args[2], NumberStyles.HexNumber)),
     "render" when args.Length >= 4 => Render(args[1], args[2], args[3]),
     _ => Usage(),
