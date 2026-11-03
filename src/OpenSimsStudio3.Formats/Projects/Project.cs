@@ -16,8 +16,11 @@ public sealed record Project
     public int Format { get; init; } = CurrentFormat;
     public string Id { get; init; } = "";
     public string Name { get; init; } = "";
-    /// <summary>Retail, Both or OpenTS3Only.</summary>
+    /// <summary>Retail, Both or OpenTS3Only, as written in project.json; <see cref="ParsedTarget" /> reads it.</summary>
     public string Target { get; init; } = "Retail";
+    /// <summary><see cref="Target" /> as a <see cref="ProjectTarget" />; an unknown value reads as Retail.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public ProjectTarget ParsedTarget => ProjectTargets.Parse(Target);
     /// <summary>CasClone (a new item) or CasDefaultReplacement (overrides the game's part under its own keys).</summary>
     public string Kind { get; init; } = "CasClone";
     public string SourceKey { get; init; } = "";
@@ -41,13 +44,21 @@ public sealed record Project
         return project;
     }
 
+    /// <summary>Writes project.json with a new target (and Modified time) and returns the written project.</summary>
+    public Project WriteTarget(string folder, ProjectTarget target)
+    {
+        var changed = this with { Target = target.Id(), Modified = DateTime.UtcNow };
+        changed.Write(folder);
+        return changed;
+    }
+
     public void Write(string folder) => File.WriteAllText(Path.Combine(folder, FileName), JsonSerializer.Serialize(this, Json));
 
     /// <summary>
     /// Creates a project folder under <paramref name="projectsRoot" /> for a clone of one game CAS part and writes its
     /// package. The folder name is the project name made file-safe, numbered when taken. Returns the folder.
     /// </summary>
-    public static string CreateCasClone(string projectsRoot, string name, string target, IResourceSource game,
+    public static string CreateCasClone(string projectsRoot, string name, ProjectTarget target, IResourceSource game,
         ResourceKey sourceCasp, string sourceName, int sourceProduct, string sourcePackage = "", bool defaultReplacement = false)
     {
         var safe = string.Concat(name.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c)).Trim().TrimEnd('.');
@@ -63,7 +74,7 @@ public sealed record Project
             var now = DateTime.UtcNow;
             new Project
             {
-                Id = id, Name = name, Kind = defaultReplacement ? "CasDefaultReplacement" : "CasClone", Target = target, SourceKey = sourceCasp.ToString(), SourceName = sourceName, SourcePackage = sourcePackage,
+                Id = id, Name = name, Kind = defaultReplacement ? "CasDefaultReplacement" : "CasClone", Target = target.Id(), SourceKey = sourceCasp.ToString(), SourceName = sourceName, SourcePackage = sourcePackage,
                 Casp = result.NewCasp.ToString(), Package = package, SourceProduct = sourceProduct, Created = now, Modified = now,
             }.Write(folder);
             return folder;

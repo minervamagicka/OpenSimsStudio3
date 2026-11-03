@@ -11,12 +11,12 @@ static class ProjectCheck
         var item = CasCatalog.Load(install).Items.First(i => i.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         var index = ResourceIndex.Build(install);
         Directory.CreateDirectory(root);
-        var folder = Project.CreateCasClone(root, "Test " + item.Name, "Both", index, new ResourceKey(0x034AEECB, item.Group, item.Instance), item.Name, item.ProductMajor);
+        var folder = Project.CreateCasClone(root, "Test " + item.Name, ProjectTarget.Both, index, new ResourceKey(0x034AEECB, item.Group, item.Instance), item.Name, item.ProductMajor);
         var project = Project.Read(folder);
         var package = Path.Combine(folder, project.Package);
         Console.WriteLine($"{folder}\n  {project.Name} target {project.Target} from {project.SourceName} ({project.SourceKey}) -> {project.Casp}");
         Console.WriteLine($"  files: {string.Join(", ", Directory.GetFiles(folder).Select(Path.GetFileName))}; package {new FileInfo(package).Length} bytes");
-        var again = Project.CreateCasClone(root, "Test " + item.Name, "Both", index, new ResourceKey(0x034AEECB, item.Group, item.Instance), item.Name, item.ProductMajor);
+        var again = Project.CreateCasClone(root, "Test " + item.Name, ProjectTarget.Both, index, new ResourceKey(0x034AEECB, item.Group, item.Instance), item.Name, item.ProductMajor);
         Console.WriteLine($"  same name again -> {Path.GetFileName(again)}; new CASP {Project.Read(again).Casp} (differs: {Project.Read(again).Casp != project.Casp})");
         return 0;
     }

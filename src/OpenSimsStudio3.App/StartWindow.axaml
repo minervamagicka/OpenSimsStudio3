@@ -19,8 +19,8 @@
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Bottom">
                     <Button Classes="navigation" Content="Settings" Click="ShowSettings" />
-                    <Button Classes="navigation" Content="Report a bug" Click="NotYet" />
-                    <Button Classes="navigation" Content="About" Click="NotYet" />
+                    <Button Classes="navigation" Content="Report a bug" Click="ReportBug" />
+                    <Button Classes="navigation" Content="About" Click="ShowAbout" />
                 </StackPanel>
             </DockPanel>
         </Border>

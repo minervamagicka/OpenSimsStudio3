@@ -71,14 +71,17 @@ against the boards, or against screenshots shared outside the repo.
   - Merged export of several projects into one package is planned.
 - **Wording:** no explanatory text in the UI. Labels and controls speak for themselves; explanations go in tooltips or docs. Button labels are short (Bake, Replace…, Export…, Show UVs, Add…), except Edit in Blender, which keeps its full label.
 
-## Built vs mockup (2026-11-01)
+## Built vs mockup (2026-11-03)
 - **Built:**
   - Start screen, browser and clone/default-replacement flow.
   - Editor layout, item properties, recolour block (colours, textures, live preview).
   - LOD and group outline, Edit in Blender, morph sliders, camera presets, Whole Sim, Settings page.
+  - The editor title bar's Target picker (changes are written to project.json at once). The "OpenTS3 only" gate for
+    controls exists (`OpenTS3OnlyGate`) but nothing uses it yet: OSS3 has no OpenTS3-only settings, so leaving
+    OpenTS3 only never asks.
+  - About (a start-screen page) and Report a bug (opens a new GitHub issue with the version and OS filled in).
 - **Not built:**
   - The texture window, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
   - Fit to body, UV warnings, shader parameters, the bones list, LOD regenerate.
   - The CAS camera, pose and animation, Outfit….
-  - The target picker in the editor and the Export window.
-  - Report a bug, About.
+  - The Export window.

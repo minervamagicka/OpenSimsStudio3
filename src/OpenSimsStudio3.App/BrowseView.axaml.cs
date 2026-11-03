@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using CASPartResource;
 using OpenSimsStudio3.Formats.Catalog;
 using OpenSimsStudio3.Formats.Install;
+using OpenSimsStudio3.Formats.Projects;
 
 namespace OpenSimsStudio3.App;
 
@@ -31,9 +32,6 @@ public sealed class BrowseTile(CasItem item, Bitmap? productIcon) : System.Compo
     public string Glyph => BrowseView.GlyphOf(Item.Category);
     public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
 }
-
-/// <summary>Project targets (BRIEF.md "Project target"): what the export is allowed to contain.</summary>
-public enum ProjectTarget { Retail, Both, OpenTS3Only }
 
 /// <summary>
 /// "Clone a game item": the player's CAS parts by category and species, searchable, with details of the selected part.
@@ -199,9 +197,9 @@ public partial class BrowseView : UserControl
 
     void BuildTargets()
     {
-        foreach (var (target, label) in new[] { (ProjectTarget.Retail, "Retail"), (ProjectTarget.Both, "Both"), (ProjectTarget.OpenTS3Only, "OpenTS3 only") })
+        foreach (var target in ProjectTargets.All)
         {
-            var button = new Button { Content = label, Padding = new Avalonia.Thickness(14, 8), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+            var button = new Button { Content = target.DisplayName(), Padding = new Avalonia.Thickness(14, 8), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
             if (target == _target) button.Classes.Add("selected");
             button.Click += (_, _) =>
             {
