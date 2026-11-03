@@ -69,16 +69,23 @@ against the boards, or against screenshots shared outside the repo.
   - Checks are one-line labels with a Show link on problems.
   - It offers a copy to a test profile and clears that profile's CAS caches.
   - Merged export of several projects into one package is planned.
+  - .sims3pack starts unchecked until the format is verified in game (2026-11-03); its tooltip says so.
+  - Clearing the CAS caches lists the files and asks before deleting them.
 - **Wording:** no explanatory text in the UI. Labels and controls speak for themselves; explanations go in tooltips or docs. Button labels are short (Bake, Replace…, Export…, Show UVs, Add…), except Edit in Blender, which keeps its full label.
 
-## Built vs mockup (2026-11-01)
+## Built vs mockup (2026-11-03)
 - **Built:**
   - Start screen, browser and clone/default-replacement flow.
   - Editor layout, item properties, recolour block (colours, textures, live preview).
   - LOD and group outline, Edit in Blender, morph sliders, camera presets, Whole Sim, Settings page.
+  - The Export window (File › Export…, Ctrl+E) for the open project: checks with Show, .package and .sims3pack,
+    Save to folder, the test-profile copy with cache clearing, and the Exported box with Show in folder.
 - **Not built:**
   - The texture window, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
   - Fit to body, UV warnings, shader parameters, the bones list, LOD regenerate.
   - The CAS camera, pose and animation, Outfit….
-  - The target picker in the editor and the Export window.
+  - The target picker in the editor.
+  - In the Export window: the checks for flags, mesh, bones, morphs, LODs, UVs and textures (it checks projects,
+    packages, the CAS part, keys, output and test profile today); Compress textures and meshes (exports always
+    compress); Launch test game; the multi-project picker.
   - Report a bug, About.

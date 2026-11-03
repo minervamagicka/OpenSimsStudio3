@@ -75,6 +75,7 @@ public partial class EditorWindow : Window
         SaveButton.Click += (_, _) => Save();
         SaveItem.Click += (_, _) => Save();
         CloseItem.Click += (_, _) => Close();
+        ExportItem.Click += (_, _) => OpenExport();
         ResetViewItem.Click += (_, _) => _viewport.ResetCamera();
         CameraBox.ItemsSource = new[] { "Free", "Front", "Side", "Close-up" };
         CameraBox.SelectedIndex = 0;
@@ -89,6 +90,7 @@ public partial class EditorWindow : Window
         PregnantSlider.ValueChanged += (_, _) => { _shape = _shape with { Pregnancy = (float)PregnantSlider.Value }; Reshape(); };
         ShapeReset.Click += (_, _) => (WeightSlider.Value, FitSlider.Value, PregnantSlider.Value) = (0, 0, 0);
         KeyDown += (_, e) => { if (e.Key == Key.S && e.KeyModifiers.HasFlag(KeyModifiers.Control)) Save(); };
+        KeyDown += (_, e) => { if (e.Key == Key.E && e.KeyModifiers.HasFlag(KeyModifiers.Control)) OpenExport(); };
         LodBox.SelectionChanged += (_, _) => ShowLod();
         Closing += OnClosing;
         Closed += (_, _) => { _renderer.Dispose(); ProjectClosed?.Invoke(); };
@@ -469,6 +471,18 @@ public partial class EditorWindow : Window
             SaveState.Text = "Could not save: " + error.Message;
             Console.Error.WriteLine($"OSS3: saving {_session.PackagePath} failed: {error}");
         }
+    }
+
+    /// <summary>File › Export…: the export reads the saved package, so unsaved changes are saved first (after asking).</summary>
+    async void OpenExport()
+    {
+        if (_session.Dirty)
+        {
+            if (await ConfirmDialog.Ask(this, "Save changes?", $"{_session.Project.Name} has unsaved changes.", "Save", "Cancel") != 0) return;
+            Save();
+            if (_session.Dirty) return;
+        }
+        await new ExportWindow([_session.Folder]).ShowDialog(this);
     }
 
     void UpdateSaveState() => SaveState.Text = _session.Dirty ? "Unsaved changes" : SaveState.Text == "Unsaved changes" ? "" : SaveState.Text;

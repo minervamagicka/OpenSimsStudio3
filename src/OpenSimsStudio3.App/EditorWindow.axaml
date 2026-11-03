@@ -10,6 +10,7 @@
                 <Menu DockPanel.Dock="Left" Background="Transparent">
                     <MenuItem Header="_File">
                         <MenuItem x:Name="SaveItem" Header="_Save" InputGesture="Ctrl+S" />
+                        <MenuItem x:Name="ExportItem" Header="_Export…" InputGesture="Ctrl+E" />
                         <MenuItem x:Name="CloseItem" Header="_Close project" />
                     </MenuItem>
                     <MenuItem Header="_View">
