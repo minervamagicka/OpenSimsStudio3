@@ -321,9 +321,13 @@ public partial class EditorWindow : Window
 
     // ---- Outline and inspector ----
 
+    // The outline's group entries, so a warning can jump to its group.
+    readonly Dictionary<(int Lod, int Group), (Button Entry, Action Show)> _groupEntries = new();
+
     void BuildOutline()
     {
         Outline.Children.Clear();
+        _groupEntries.Clear();
         Section("RECOLOURS");
         for (var i = 0; i < Part.Presets.Count; i++)
         {
@@ -340,7 +344,8 @@ public partial class EditorWindow : Window
             {
                 var group = lod.Groups[g];
                 var index = g;
-                Entry($"    Group {g}  ·  {group.Vertices:N0} v", () => ShowGroup(lod, index, group));
+                Action show = () => ShowGroup(lod, index, group);
+                _groupEntries[(lod.Id, g)] = (Entry($"    Group {g}  ·  {group.Vertices:N0} v", show), show);
             }
         }
         if (_session.Lods.Count == 0) Note("No mesh");
@@ -356,22 +361,42 @@ public partial class EditorWindow : Window
         var warnings = Warnings();
         Section($"WARNINGS{(warnings.Count > 0 ? $" ({warnings.Count})" : "")}");
         if (warnings.Count == 0) Note("None");
+        var warn = (IBrush)Application.Current!.FindResource("Warn")!;
         foreach (var w in warnings)
-            Outline.Children.Add(new TextBlock { Text = "⚠ " + w, Foreground = (IBrush)Application.Current!.FindResource("Warn")!, FontSize = 12, Margin = new Thickness(10, 2), TextWrapping = TextWrapping.Wrap });
+        {
+            if (w.Group is not { } at || !_groupEntries.ContainsKey(at))
+            {
+                Outline.Children.Add(new TextBlock { Text = "⚠ " + w.Text, Foreground = warn, FontSize = 12, Margin = new Thickness(10, 2), TextWrapping = TextWrapping.Wrap });
+                continue;
+            }
+            // Jumps to the group it applies to.
+            var jump = new Button { Content = "⚠ " + w.Text, Classes = { "navigation" }, Foreground = warn, Height = 30, MinHeight = 30, FontSize = 12, Padding = new Thickness(10, 2) };
+            if (w.Tip != null) ToolTip.SetTip(jump, w.Tip);
+            jump.Click += (_, _) => { if (_groupEntries.TryGetValue(at, out var entry)) Select(entry.Entry, entry.Show); };
+            Outline.Children.Add(jump);
+        }
     }
 
-    List<string> Warnings()
+    /// <summary>One line in the warnings list; <see cref="Group" /> is the (LOD, group) it jumps to, if any.</summary>
+    sealed record Warning(string Text, (int Lod, int Group)? Group = null, string? Tip = null);
+
+    // Hair layers its strands over the same texture on purpose, so its UV overlaps are not warned about.
+    static bool IsHairShader(uint shader) => ShaderNames.TryGetValue(shader, out var name) && name.Contains("Hair", StringComparison.Ordinal);
+
+    List<Warning> Warnings()
     {
-        var list = new List<string>();
-        if (((uint)Part.ClothingCategory & 0xFFFFF) == 0) list.Add("No outfit categories: the part shows in no CAS category.");
-        if (Part.AgeGender.Age == 0) list.Add("No ages ticked.");
-        if (Part.AgeGender.Gender == 0) list.Add("No genders ticked.");
+        var list = new List<Warning>();
+        if (((uint)Part.ClothingCategory & 0xFFFFF) == 0) list.Add(new("No outfit categories: the part shows in no CAS category."));
+        if (Part.AgeGender.Age == 0) list.Add(new("No ages ticked."));
+        if (Part.AgeGender.Gender == 0) list.Add(new("No genders ticked."));
         foreach (var lod in _session.Lods)
             for (var g = 0; g < lod.Groups.Count; g++)
             {
                 var group = lod.Groups[g];
-                if (group.Vertices == 0) list.Add($"LOD {lod.Id} group {g}: mesh missing or unreadable.");
-                if (group.VertexColourAllZero) list.Add($"LOD {lod.Id} group {g}: vertex colour is all zero, which renders hair black.");
+                if (group.Vertices == 0) list.Add(new($"LOD {lod.Id} group {g}: mesh missing or unreadable.", (lod.Id, g)));
+                if (group.VertexColourAllZero) list.Add(new($"LOD {lod.Id} group {g}: vertex colour is all zero, which renders hair black.", (lod.Id, g)));
+                foreach (var issue in group.UvCheck.Warnings(IsHairShader(group.Shader)))
+                    list.Add(new($"{UvWording.Label(issue)} · LOD {lod.Id}, Group {g}", (lod.Id, g), UvWording.Tip(issue)));
             }
         return list;
     }
@@ -382,16 +407,20 @@ public partial class EditorWindow : Window
     void Note(string text) =>
         Outline.Children.Add(new TextBlock { Text = text, FontSize = 12, Foreground = Muted, Margin = new Thickness(10, 2) });
 
-    void Entry(string text, Action select)
+    Button Entry(string text, Action select)
     {
         var button = new Button { Content = text, Classes = { "navigation" }, Height = 34, Margin = new Thickness(0), FontSize = 13 };
-        button.Click += (_, _) =>
-        {
-            foreach (var b in Outline.Children.OfType<Button>()) b.Classes.Remove("selected");
-            button.Classes.Add("selected");
-            select();
-        };
+        button.Click += (_, _) => Select(button, select);
         Outline.Children.Add(button);
+        return button;
+    }
+
+    void Select(Button entry, Action show)
+    {
+        foreach (var b in Outline.Children.OfType<Button>()) b.Classes.Remove("selected");
+        entry.Classes.Add("selected");
+        entry.BringIntoView();
+        show();
     }
 
     void ShowRecolour(int index)
@@ -420,7 +449,24 @@ public partial class EditorWindow : Window
             ("Triangles", group.Triangles.ToString("N0")),
             ("Shader", ShaderNames.TryGetValue(group.Shader, out var n) ? n : $"0x{group.Shader:X8}"),
             ("Vertex colour", !group.HasVertexColour ? "none (engine default)" : group.VertexColourAllZero ? "all zero (renders black)" : "present"),
-            ("Stored in", group.InProject ? "this project" : "the game"));
+            ("Stored in", group.InProject ? "this project" : "the game"),
+            ("UVs", group.UvCheck.Channels == 0 && group.UvCheck.IsClean ? "none" : group.UvCheck.IsClean
+                ? $"{group.UvCheck.Channels} set{(group.UvCheck.Channels == 1 ? "" : "s")}, no problems"
+                : string.Join(", ", group.UvCheck.Issues.Select(i => $"{UvWording.Label(i)} ({i.Count:N0})"))));
+        var showUvs = new Button { Content = "Show UVs", Padding = new Thickness(14, 6), HorizontalAlignment = HorizontalAlignment.Left };
+        showUvs.Click += (_, _) =>
+        {
+            GeomMesh mesh;
+            try
+            {
+                if (_session.Read(group.Key) is not { } bytes) return;
+                mesh = GeomLoader.Read(new MemoryStream(bytes), group.Key.ToString());
+            }
+            catch (InvalidDataException) { return; }
+            new UvWindow($"LOD {lod.Id} · Group {index}", mesh, group.UvCheck).Show(this);
+        };
+        showUvs.IsEnabled = group.UvCheck.Channels > 0;
+        Inspector.Children.Add(showUvs);
 
         // Edit in Blender: the group goes to <project>\work as .simgeom; the user exports back over the same file.
         var file = Path.Combine(_session.Folder, "work", $"LOD{lod.Id}_group{index}.simgeom");

@@ -64,6 +64,8 @@ against the boards, or against screenshots shared outside the repo.
   - Controls that only apply to OpenTS3 are disabled with an "OpenTS3 only" note under other targets.
   - Leaving OpenTS3 only lists the settings that will be removed and asks first.
 - **No UV repacking:** OSS3 only warns about UV problems and shows them; the artist fixes them.
+  - Checked per mesh group and UV set: no UVs, outside 0–1, degenerate, flipped, overlap and mirrored overlap (`Formats/Meshes/UvAnalysis.cs`).
+  - Hair groups don't warn about overlaps (their strands share texture on purpose), and flips inside a mirrored overlap warn once, as the overlap. Show UVs still highlights everything.
 - **Export:**
   - It can write .package and .sims3pack together (checkboxes).
   - Checks are one-line labels with a Show link on problems.
@@ -80,8 +82,10 @@ against the boards, or against screenshots shared outside the repo.
     controls exists (`OpenTS3OnlyGate`) but nothing uses it yet: OSS3 has no OpenTS3-only settings, so leaving
     OpenTS3 only never asks.
   - About (a start-screen page) and Report a bug (opens a new GitHub issue with the version and OS filled in).
+  - UV warnings: one line per problem in Warnings, jumping to its group (tooltip with counts); a UVs row and Show UVs in the group inspector. Show UVs is a separate window (the group's wireframe in the 0–1 square, overlaps in Danger, other problems in Warn), not the mockup's collapsible UV layout section or the viewport's UVs mode.
 - **Not built:**
   - The texture window, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
-  - Fit to body, UV warnings, shader parameters, the bones list, LOD regenerate.
+  - Fit to body, shader parameters, the bones list, LOD regenerate.
+  - The UV overlap check against the body's UVs (the mockup's "overlaps the body's UVs"), and the viewport's UVs mode.
   - The CAS camera, pose and animation, Outfit….
   - The Export window.
