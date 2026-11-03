@@ -74,6 +74,13 @@ against the boards, or against screenshots shared outside the repo.
 - **Export:**
   - It can write .package and .sims3pack together (checkboxes).
   - Checks are one-line labels with a Show link on problems.
+  - The checks of a project's own content (flags, mesh, bones, morphs, LODs, UVs, textures; `Formats/Projects/PartChecks.cs`)
+    are the editor's Warnings list too: one implementation, the same labels. Each area with no problem reads as one
+    passed line (Item flags, Mesh, Bones and weights, Morphs, LODs, UVs, Recolours and textures). Errors (export
+    refused): a missing or unreadable mesh or mesh list, weights on bones past the group's bone list, a missing skin
+    (BONE), a texture in neither the project nor the game. Everything else warns.
+  - Show on a content check closes the export window and goes there in the editor: the item properties, the mesh,
+    a LOD or group, the morphs, or a recolour (2026-11-03).
   - It offers a copy to a test profile and clears that profile's CAS caches.
   - Merged export of several projects into one package is planned.
   - .sims3pack starts unchecked until the format is verified in game (2026-11-03); its tooltip says so.
@@ -93,11 +100,15 @@ against the boards, or against screenshots shared outside the repo.
   - The texture window (PNG Import…/Export…, Clear, R/G/B/A view, Same in all recolours) and the link icon on shared slots.
   - The Export window (File › Export…, Ctrl+E) for the open project: checks with Show, .package and .sims3pack,
     Save to folder, the test-profile copy with cache clearing, and the Exported box with Show in folder.
+  - The export checks for flags (categories, ages, genders, species), mesh, bones and weights, morphs, LODs, UVs and
+    recolour textures, shared with the editor's Warnings; Show goes to the place in the editor. They run once when the
+    window opens ("Checking the project…"; Export waits). Bone hashes are checked against the group's own bone list
+    and its skin (BONE) resource, not against the game's rig. A broken morph link shows in the outline's Morphs list.
 - **Not built:**
   - Bake in the texture window, slot thumbnails, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
   - Fit to body, shader parameters, the bones list, LOD regenerate.
   - The UV overlap check against the body's UVs (the mockup's "overlaps the body's UVs"), and the viewport's UVs mode.
   - The CAS camera, pose and animation, Outfit….
-  - In the Export window: the checks for flags, mesh, bones, morphs, LODs, UVs and textures (it checks projects,
-    packages, the CAS part, keys, output and test profile today); Compress textures and meshes (exports always
+  - In the Export window: the mockup's "Thumbnails and keys" check; Compress textures and meshes (exports always
     compress); Launch test game; the multi-project picker.
+  - Bone hashes matched against the game's rig (OSS3 has no rig reader yet).

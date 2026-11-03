@@ -180,10 +180,11 @@ public static class PartChecks
     {
         var bones = group.Bones;
         void Add(CheckSeverity severity, string label, string tip) => list.Add(Problem(severity, CheckArea.Bones, $"{label} · {At(lod, g)}", at, tip));
+        // With no bone list at all the weights mean nothing, so only that is reported.
         if (bones.Bones == 0) Add(CheckSeverity.Warning, "No bones", "The group has no bone list, so it will not follow the Sim.");
-        if (bones.BadReferences > 0)
+        else if (bones.BadReferences > 0)
             Add(CheckSeverity.Error, "Weights on missing bones", $"{bones.BadReferences:N0} vertices are weighted to bones past the group's {bones.Bones} bones.");
-        if (bones.Unweighted > 0)
+        if (bones.Bones > 0 && bones.Unweighted > 0)
             Add(CheckSeverity.Warning, "Vertices without weights", $"{bones.Unweighted:N0} vertices have no bone weight and stay put when the Sim moves.");
         if (bones.Skin is { } skin && !session.Contains(skin))
             Add(CheckSeverity.Error, "Skin (BONE) missing", $"{skin} is in neither the project nor the game.");

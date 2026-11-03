@@ -11,6 +11,7 @@ using OpenSimsStudio3.Rendering;
 //   render <package> <instance|first> <out.bmp>  render one GEOM offscreen with Vulkan
 //   roundtrip <casp|geom> <package>...    parse and rewrite every resource of a type, compare bytes
 //   uvs <package>... [--all]              run the UV checks on every GEOM; print problems and a tally per kind
+//   checks <project>...                   the export window's content checks against the install, one line each
 return args.Length > 0 ? args[0] switch
 {
     "geoms" when args.Length >= 2 => Geoms(args[1], args.Length > 2 ? int.Parse(args[2]) : 10),
@@ -36,6 +37,7 @@ return args.Length > 0 ? args[0] switch
     "tangents" when args.Length >= 3 => TangentCheck.Run(args[1..]),
     "mesh" when args.Length >= 6 => MeshCheck.Run(args[1], args[2], int.Parse(args[3]), int.Parse(args[4]), args[5]),
     "session" when args.Length >= 2 => SessionCheck.Run(args[1], args.Length > 2 && args[2] == "--show"),
+    "checks" when args.Length >= 2 => ContentChecks.Run(args[1..]),
     "export" when args.Length >= 3 => ExportCheck.Run(args[1], args[2..]),
     "sims3pack" when args.Length >= 2 => Sims3PackDump.Run(args[1]),
     "keys" when args.Length >= 2 => PackageKeys.Run(args[1], args.Length > 2 ? args[2] : null),
