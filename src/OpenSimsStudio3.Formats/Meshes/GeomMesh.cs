@@ -19,6 +19,12 @@ public sealed record GeomMesh(
     /// <summary>First UV set per vertex, as stored (empty when the GEOM has none).</summary>
     public Vector2[] Uvs { get; init; } = [];
 
+    /// <summary>Further UV sets per vertex (the GEOM's second UV element on), as stored. <see cref="Merge" /> drops them.</summary>
+    public Vector2[][] ExtraUvs { get; init; } = [];
+
+    /// <summary>Every UV set, first one first; empty when the GEOM has none.</summary>
+    public IReadOnlyList<Vector2[]> UvChannels => Uvs.Length == 0 ? [] : [Uvs, .. ExtraUvs];
+
     /// <summary>VertexID element per vertex, as stored (empty when the GEOM has none). Morph GEOMs repeat the base's IDs.</summary>
     public uint[] VertexIds { get; init; } = [];
 

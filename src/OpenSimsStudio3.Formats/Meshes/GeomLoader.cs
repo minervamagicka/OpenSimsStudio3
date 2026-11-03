@@ -48,10 +48,10 @@ public static class GeomLoader
         var hasUvs = false;
         var ids = new uint[count];
         var hasIds = false;
-        var uvSeen = new bool[count];
-        bool hasUvsFor(int v) => uvSeen[v];
+        var extraUvs = new List<System.Numerics.Vector2[]>();
         for (var i = 0; i < count; i++)
         {
+            var uvChannel = 0;
             foreach (var element in geom.VertexData[i].Vertex)
             {
                 // NormalElement derives from PositionElement, so match the exact type.
@@ -70,11 +70,17 @@ public static class GeomLoader
                     ids[i] = id.ID;
                     hasIds = true;
                 }
-                else if (element is GEOM.UVElement uv && !hasUvsFor(i))
+                else if (element is GEOM.UVElement uv)
                 {
-                    uvs[i] = new System.Numerics.Vector2(uv.U, uv.V);
-                    hasUvs = true;
-                    uvSeen[i] = true;
+                    // UV elements come in the vertex format's order: the first is UV set 0, the next set 1, and so on.
+                    var value = new System.Numerics.Vector2(uv.U, uv.V);
+                    if (uvChannel == 0) { uvs[i] = value; hasUvs = true; }
+                    else
+                    {
+                        while (extraUvs.Count < uvChannel) extraUvs.Add(new System.Numerics.Vector2[count]);
+                        extraUvs[uvChannel - 1][i] = value;
+                    }
+                    uvChannel++;
                 }
             }
         }
@@ -92,7 +98,7 @@ public static class GeomLoader
 
         // Morph GEOMs (shader 0) carry deltas, not a drawable shape; they still load, the caller decides.
         if (!hasNormals) normals = ComputeNormals(positions, indices);
-        return new GeomMesh(name, positions, normals, indices, geom.BoneHashes.Count, (uint)geom.Shader) { Uvs = hasUvs ? uvs : [], VertexIds = hasIds ? ids : [] };
+        return new GeomMesh(name, positions, normals, indices, geom.BoneHashes.Count, (uint)geom.Shader) { Uvs = hasUvs ? uvs : [], ExtraUvs = hasUvs ? extraUvs.ToArray() : [], VertexIds = hasIds ? ids : [] };
     }
 
     static Vector3[] ComputeNormals(Vector3[] positions, uint[] indices)
