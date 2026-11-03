@@ -13,44 +13,20 @@ public sealed record ExportResult(int Resources, IReadOnlyList<string> Projects,
 /// in as they are. Nothing is written when two projects hold the same key, because the game would load only one of them;
 /// default replacements of the same game part collide this way too. A merge's target is the strictest of its projects'
 /// (Retail before Both before OpenTS3Only); OSS3 resources are all retail-valid today, so the target only gates
-/// future OpenTS3-only data. The output path must not be one of the projects' own packages.
+/// future OpenTS3-only data. The output path must not be one of the projects' own packages. The checks are
+/// <see cref="ExportChecks" />.
 /// </summary>
 public static class ProjectExport
 {
-    public static ExportResult Export(IReadOnlyList<string> projectFolders, string outPath)
+    public static ExportResult Export(IReadOnlyList<string> projectFolders, string outPath) => Export(ExportChecks.Run(projectFolders, outPath));
+
+    /// <summary>Writes the export <paramref name="plan" /> checked, to its path; nothing is written when a check failed with an error.</summary>
+    public static ExportResult Export(ExportPlan plan)
     {
-        var problems = new List<string>();
-        var owner = new Dictionary<ResourceKey, string>();
-        var reads = new List<(string Project, string Package)>();
-        foreach (var folder in projectFolders)
-        {
-            Project project;
-            try { project = Project.Read(folder); }
-            catch (Exception error) when (error is IOException or InvalidDataException or System.Text.Json.JsonException)
-            {
-                problems.Add($"{folder}: {error.Message}");
-                continue;
-            }
-            var package = Path.Combine(folder, project.Package);
-            if (string.Equals(Path.GetFullPath(package), Path.GetFullPath(outPath), StringComparison.OrdinalIgnoreCase))
-            {
-                problems.Add($"{project.Name}: the export would overwrite this project's own package");
-                continue;
-            }
-            reads.Add((project.Name, package));
-            var p = s3pi.Package.Package.OpenPackage(0, package, false);
-            try
-            {
-                foreach (var e in p.GetResourceList.Where(e => !e.IsDeleted))
-                {
-                    var key = ResourceKey.Of(e);
-                    if (owner.TryGetValue(key, out var other)) problems.Add($"{key} is in both \"{other}\" and \"{project.Name}\"");
-                    else owner[key] = project.Name;
-                }
-            }
-            finally { s3pi.Package.Package.ClosePackage(0, p); }
-        }
-        if (problems.Count > 0) return new ExportResult(0, reads.Select(r => r.Project).ToList(), problems);
+        var outPath = plan.OutPath;
+        var reads = plan.Sources.Select(s => (s.Name, s.Package)).ToList();
+        var problems = plan.Checks.Where(c => c.Severity == CheckSeverity.Error).Select(c => c.Label).ToList();
+        if (problems.Count > 0) return new ExportResult(0, reads.Select(r => r.Name).ToList(), problems);
 
         var output = s3pi.Package.Package.NewPackage(0);
         var count = 0;
@@ -77,6 +53,6 @@ public static class ProjectExport
             output.SaveAs(outPath);
         }
         finally { s3pi.Package.Package.ClosePackage(0, output); }
-        return new ExportResult(count, reads.Select(r => r.Project).ToList(), problems);
+        return new ExportResult(count, reads.Select(r => r.Name).ToList(), problems);
     }
 }

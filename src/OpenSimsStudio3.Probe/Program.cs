@@ -37,6 +37,7 @@ return args.Length > 0 ? args[0] switch
     "mesh" when args.Length >= 6 => MeshCheck.Run(args[1], args[2], int.Parse(args[3]), int.Parse(args[4]), args[5]),
     "session" when args.Length >= 2 => SessionCheck.Run(args[1], args.Length > 2 && args[2] == "--show"),
     "export" when args.Length >= 3 => ExportCheck.Run(args[1], args[2..]),
+    "sims3pack" when args.Length >= 2 => Sims3PackDump.Run(args[1]),
     "keys" when args.Length >= 2 => PackageKeys.Run(args[1], args.Length > 2 ? args[2] : null),
     "bgeo" when args.Length >= 2 => BgeoCheck.Run(args[1..]),
     "nudes" => NudeParts.Run(),

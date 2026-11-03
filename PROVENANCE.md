@@ -6,6 +6,7 @@ else is listed here, with its source, version and licence, before it is merged.
 | Path | Source | Licence |
 |---|---|---|
 | `third_party/s3pi` | s3pi 17-0520-1823 by Peter L Jones and contributors, from the official source archive; OSS3 converted it to .NET 10 SDK projects, fixed three bugs and fixed one file name's case for Linux builds. Details: `third_party/s3pi/OPENSIMSSTUDIO3-PROVENANCE.md` | GPL-3.0-or-later |
+| `src/OpenSimsStudio3.Formats/Sims3Pack` | OSS3's own .sims3pack writer, written from public format notes; calls s3pi's Sims3PackCRC. Sources: `src/OpenSimsStudio3.Formats/Sims3Pack/README.md` | GPL-3.0-or-later (OSS3) |
 | `src/OpenSimsStudio3.Formats/Compositing` | OSS3's own compositor, written from The Sims 3's compositor templates, s3pi's TXTC code and public modding documentation. Sources: `src/OpenSimsStudio3.Formats/Compositing/README.md` | GPL-3.0-or-later (OSS3) |
 
 ## EA data

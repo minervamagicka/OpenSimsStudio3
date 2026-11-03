@@ -1,0 +1,73 @@
+<Window x:Class="OpenSimsStudio3.App.ExportWindow"
+        xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Export" Width="960" Height="640" MinWidth="820" MinHeight="520"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{StaticResource Rail}" Foreground="{StaticResource Text}" FontSize="14" UseLayoutRounding="True">
+    <!-- The export window (mockup Export.dc.html): checks on the left, formats, output and test profile on the right. -->
+    <DockPanel>
+        <Border DockPanel.Dock="Top" BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Padding="18,14">
+            <TextBlock x:Name="Heading" FontSize="16" FontWeight="SemiBold" />
+        </Border>
+
+        <Border DockPanel.Dock="Bottom" BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Padding="18,12">
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                <Button x:Name="CancelButton" Content="Cancel" Padding="18,8" />
+                <Button x:Name="ExportButton" Classes="primary" Content="Export" FontSize="14" MinWidth="120" />
+            </StackPanel>
+        </Border>
+
+        <Grid ColumnDefinitions="*,380">
+            <Border BorderBrush="{StaticResource Line}" BorderThickness="0,0,1,0">
+                <DockPanel Margin="18,16">
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
+                        <TextBlock x:Name="Summary" DockPanel.Dock="Right" FontSize="12" VerticalAlignment="Center" />
+                        <TextBlock Text="Checks" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </DockPanel>
+                    <ScrollViewer>
+                        <StackPanel x:Name="CheckList" />
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <ScrollViewer Grid.Column="1">
+                <StackPanel Margin="18,16" Spacing="8">
+                    <TextBlock Classes="eyebrow" Text="FORMATS" />
+                    <CheckBox x:Name="PackageBox" Content=".package (Mods folder)" FontSize="13" />
+                    <CheckBox x:Name="Sims3PackBox" Content=".sims3pack (game launcher)" FontSize="13"
+                              ToolTip.Tip="The .sims3pack format is not verified in game yet." />
+                    <TextBlock x:Name="TargetText" FontSize="12" Foreground="{StaticResource Muted}" />
+
+                    <TextBlock Classes="eyebrow" Text="SAVE TO FOLDER" Margin="0,10,0,0" />
+                    <DockPanel>
+                        <Button x:Name="BrowseOutput" DockPanel.Dock="Right" Content="Browse…" Margin="8,0,0,0" Padding="14,6" />
+                        <TextBox x:Name="OutputBox" FontSize="13" VerticalContentAlignment="Center" />
+                    </DockPanel>
+
+                    <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1,0,0" Margin="0,10,0,0" Padding="0,12,0,0">
+                        <StackPanel Spacing="8">
+                            <TextBlock Classes="eyebrow" Text="TEST IN GAME" />
+                            <CheckBox x:Name="CopyBox" Content="Copy to test profile's Mods folder" FontSize="13" />
+                            <CheckBox x:Name="ClearBox" Content="Clear that profile's CAS caches" FontSize="13"
+                                      ToolTip.Tip="Deletes CASPartCache.package and simCompositorCache.package in the profile folder." />
+                            <DockPanel>
+                                <Button x:Name="BrowseProfile" DockPanel.Dock="Right" Content="Browse…" Margin="8,0,0,0" Padding="14,6" />
+                                <TextBox x:Name="ProfileBox" FontSize="13" VerticalContentAlignment="Center"
+                                         ToolTip.Tip="A Sims 3 user folder, e.g. Documents\Electronic Arts\The Sims 3" />
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border x:Name="DonePanel" IsVisible="False" Margin="0,10,0,0" Padding="12,10" CornerRadius="8"
+                            Background="#16241B" BorderBrush="#2F5A3E" BorderThickness="1">
+                        <StackPanel Spacing="6">
+                            <TextBlock x:Name="DoneTitle" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource Success}" />
+                            <TextBlock x:Name="DoneFiles" FontSize="12" Foreground="{StaticResource NavText}" TextWrapping="Wrap" />
+                            <Button x:Name="ShowFolderButton" Content="Show in folder" Padding="14,6" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock x:Name="ErrorText" IsVisible="False" FontSize="12" Foreground="{StaticResource Danger}" TextWrapping="Wrap" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</Window>

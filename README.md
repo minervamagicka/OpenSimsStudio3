@@ -41,8 +41,9 @@ viewport, one editor screen instead of a wizard, and source anyone can read and 
     (Thin–Fat, Normal–Fit, Pregnant) applied from its BGEO data.
   - Warnings for missing categories, ages, genders or mesh groups and for broken hair vertex colour.
 - **Saving** rewrites the project package safely and keeps a `.bak`.
-- **Export** of one or more projects into a single `.package`, with key-collision checks (core only; the window is
-  not built yet).
+- **Export** (File › Export…): checks with a Show link on each problem, `.package` and `.sims3pack` output, and a copy
+  to a test profile's `Mods\Packages` that clears its CAS caches. The core merges several projects into one package;
+  the window exports the open project. The `.sims3pack` format is not verified in game yet.
 
 Round trips are exact: every CASP and GEOM in the base game and all packs re-serialises byte for byte, and every
 preset XML does too.
@@ -51,7 +52,7 @@ preset XML does too.
 
 - The texture window (import, bake, clear, share across recolours), thumbnails and patterns.
 - Fit to body, UV checks, shader parameters, bones and LOD generation.
-- The export window, `.sims3pack` output and a test-profile copy.
+- Merged export of several projects from the window, more export checks, and `.sims3pack` verified in game.
 - A CAS camera, poses and outfit preview.
 - Build/Buy objects and patterns after CAS.
 
@@ -96,6 +97,7 @@ dotnet test tests/OpenSimsStudio3.Tests -c Release
 | `clone <part> <out.package>` | A clone re-parses and every reference resolves |
 | `bgeo <part>…` | Morph decoding against the game's own morph meshes |
 | `compose --survey <n>` | The compositor on every complate in the install |
+| `sims3pack <file>` | A `.sims3pack`'s header, manifest and CRCs |
 
 ```
 dotnet artifacts/bin/OpenSimsStudio3.Probe/release/OpenSimsStudio3.Probe.dll install

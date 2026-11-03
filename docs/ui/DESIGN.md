@@ -76,6 +76,8 @@ against the boards, or against screenshots shared outside the repo.
   - Checks are one-line labels with a Show link on problems.
   - It offers a copy to a test profile and clears that profile's CAS caches.
   - Merged export of several projects into one package is planned.
+  - .sims3pack starts unchecked until the format is verified in game (2026-11-03); its tooltip says so.
+  - Clearing the CAS caches lists the files and asks before deleting them.
 - **Wording:** no explanatory text in the UI. Labels and controls speak for themselves; explanations go in tooltips or docs. Button labels are short (Bake, Replace…, Export…, Show UVs, Add…), except Edit in Blender, which keeps its full label.
 
 ## Built vs mockup (2026-11-03)
@@ -89,9 +91,13 @@ against the boards, or against screenshots shared outside the repo.
   - About (a start-screen page) and Report a bug (opens a new GitHub issue with the version and OS filled in).
   - UV warnings: one line per problem in Warnings, jumping to its group (tooltip with counts); a UVs row and Show UVs in the group inspector. Show UVs is a separate window (the group's wireframe in the 0–1 square, overlaps in Danger, other problems in Warn), not the mockup's collapsible UV layout section or the viewport's UVs mode.
   - The texture window (PNG Import…/Export…, Clear, R/G/B/A view, Same in all recolours) and the link icon on shared slots.
+  - The Export window (File › Export…, Ctrl+E) for the open project: checks with Show, .package and .sims3pack,
+    Save to folder, the test-profile copy with cache clearing, and the Exported box with Show in folder.
 - **Not built:**
   - Bake in the texture window, slot thumbnails, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
   - Fit to body, shader parameters, the bones list, LOD regenerate.
   - The UV overlap check against the body's UVs (the mockup's "overlaps the body's UVs"), and the viewport's UVs mode.
   - The CAS camera, pose and animation, Outfit….
-  - The Export window.
+  - In the Export window: the checks for flags, mesh, bones, morphs, LODs, UVs and textures (it checks projects,
+    packages, the CAS part, keys, output and test profile today); Compress textures and meshes (exports always
+    compress); Launch test game; the multi-project picker.
