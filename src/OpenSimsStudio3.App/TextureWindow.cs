@@ -13,8 +13,9 @@ namespace OpenSimsStudio3.App;
 
 /// <summary>
 /// One texture slot of one recolour (mockup Editor.dc.html, the slot dialog): a large preview with R/G/B/A view
-/// toggles, Import… (PNG, encoded in the slot's format), Export… (PNG of the top mip), Clear, and Same in all
-/// recolours. While that box is ticked, Import and Clear change every recolour that has the slot; ticking it points
+/// toggles, Import… (PNG, encoded in the slot's format), Export… (PNG of the top mip), Bake (the Multiplier of a
+/// patterned recolour only: see <see cref="TextureBake" />), Clear, and Same in all recolours. While that box is
+/// ticked, Import, Bake and Clear change every recolour that has the slot; ticking it points
 /// every recolour at this recolour's texture. <see cref="Edited" /> tells the caller to refresh.
 /// </summary>
 public sealed class TextureWindow : Window
@@ -29,6 +30,7 @@ public sealed class TextureWindow : Window
     readonly TextBlock _status = new() { FontSize = 12, TextWrapping = TextWrapping.Wrap, MaxWidth = 240 };
     readonly Button _import = Action("Import…");
     readonly Button _export = Action("Export…");
+    readonly Button _bake = Action("Bake");
     readonly Button _clear = Action("Clear");
     readonly CheckBox _shared = new() { Content = "Same in all recolours", FontSize = 13, Margin = new Thickness(0, 6, 0, 0) };
     readonly Button[] _channels;
@@ -66,6 +68,8 @@ public sealed class TextureWindow : Window
 
         _import.Click += async (_, _) => await Import();
         _export.Click += async (_, _) => await Export();
+        _bake.Click += async (_, _) => await Bake();
+        _bake.IsVisible = TextureBake.Applies(session, preset, slot);
         _clear.Click += (_, _) => Run(() => RecolourTextures.Clear(_session, _preset, _slot, _shared.IsChecked == true));
         _shared.IsCheckedChanged += (_, _) =>
         {
@@ -82,7 +86,7 @@ public sealed class TextureWindow : Window
         var toggles = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 4 };
         foreach (var t in _channels) toggles.Children.Add(t);
         var left = new StackPanel { Spacing = 8, Children = { frame, toggles } };
-        var buttons = new WrapPanel { Orientation = Orientation.Horizontal, Children = { _import, _export, _clear } };
+        var buttons = new WrapPanel { Orientation = Orientation.Horizontal, Children = { _import, _export, _bake, _clear } };
         var right = new StackPanel { Spacing = 10, Children = { _size, buttons, _shared, _status } };
         var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,16,*"), Margin = new Thickness(16) };
         Grid.SetColumn(right, 2);
@@ -105,6 +109,7 @@ public sealed class TextureWindow : Window
         _size.Foreground = !empty && info == null ? Brush("Warn") : Brush("NavText");
         _export.IsEnabled = _image != null;
         _clear.IsEnabled = !empty;
+        _bake.IsEnabled = key != null;
         _import.IsEnabled = key != null;
         _filling = true;
         _shared.IsChecked = RecolourTextures.IsShared(_session, _slot);
@@ -151,6 +156,27 @@ public sealed class TextureWindow : Window
         finally { SetBusy(false); }
     }
 
+    /// <summary>
+    /// Composes the recolour on a worker thread, then stores the bake and its preset edits here. A bake the recolour
+    /// doesn't compose back to (see <see cref="BakePlan.Matches" />) is kept, with a warning.
+    /// </summary>
+    async Task Bake()
+    {
+        SetBusy(true);
+        try
+        {
+            var plan = await Task.Run(() => TextureBake.Plan(_session, _preset));
+            Run(() => TextureBake.Apply(_session, plan, _shared.IsChecked == true));
+            if (!plan.Matches && string.IsNullOrEmpty(_status.Text)) _status.Text = $"Preview differs from the bake by {plan.Difference:F1} levels";
+        }
+        catch (Exception error) when (error is InvalidOperationException or InvalidDataException or NotSupportedException or ArgumentException
+                                          or System.Xml.XmlException or IndexOutOfRangeException)
+        {
+            _status.Text = error.Message;
+        }
+        finally { SetBusy(false); }
+    }
+
     async Task Export()
     {
         if (_image is not { } image) return;
@@ -173,7 +199,7 @@ public sealed class TextureWindow : Window
 
     void SetBusy(bool busy)
     {
-        _import.IsEnabled = _export.IsEnabled = _clear.IsEnabled = _shared.IsEnabled = !busy;
+        _import.IsEnabled = _export.IsEnabled = _bake.IsEnabled = _clear.IsEnabled = _shared.IsEnabled = !busy;
         if (!busy) Refresh();
     }
 

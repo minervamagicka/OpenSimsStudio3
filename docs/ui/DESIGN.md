@@ -50,6 +50,13 @@ against the boards, or against screenshots shared outside the repo.
   - While Same in all recolours is ticked, Import and Clear change every recolour; ticking it points every recolour
     at the open recolour's texture. Unticking changes nothing until the next Import or Clear, which then applies to
     the open recolour only.
+  - **Bake** (Multiplier only, on recolours with pattern channels; decided 2026-11-03 from the board, which shows
+    Bake for the Multiplier slot alone): composes the recolour as the preview does (patterns, mask, Multiplier,
+    overlay, stencils) and writes the result into the Multiplier, in the slot's format. So the game doesn't draw the
+    patterns a second time, it also turns the pattern channels off and, only where they were drawn on top, the
+    stencils and the overlay: it tries those edits fewest first and keeps the first with which the recolour composes
+    back to the bake (`Formats/Projects/TextureBake.cs`). If none does, the bake is kept with a short warning. Same in
+    all recolours works as for Import: ticked, every recolour gets this recolour's bake and the same edits.
   - Import keeps the slot's DDS format (DXT1, DXT5; DXT3 becomes DXT5; uncompressed becomes A8R8G8B8) and takes the
     image's size, with a full mip chain. A cleared slot stays listed and shows no size.
 - **Under the preview:** Catalog (name in CAS, creator tag) and then Item properties, laid out in columns.
@@ -90,11 +97,11 @@ against the boards, or against screenshots shared outside the repo.
     OpenTS3 only never asks.
   - About (a start-screen page) and Report a bug (opens a new GitHub issue with the version and OS filled in).
   - UV warnings: one line per problem in Warnings, jumping to its group (tooltip with counts); a UVs row and Show UVs in the group inspector. Show UVs is a separate window (the group's wireframe in the 0–1 square, overlaps in Danger, other problems in Warn), not the mockup's collapsible UV layout section or the viewport's UVs mode.
-  - The texture window (PNG Import…/Export…, Clear, R/G/B/A view, Same in all recolours) and the link icon on shared slots.
+  - The texture window (PNG Import…/Export…, Bake, Clear, R/G/B/A view, Same in all recolours) and the link icon on shared slots.
   - The Export window (File › Export…, Ctrl+E) for the open project: checks with Show, .package and .sims3pack,
     Save to folder, the test-profile copy with cache clearing, and the Exported box with Show in folder.
 - **Not built:**
-  - Bake in the texture window, slot thumbnails, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
+  - Slot thumbnails, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
   - Fit to body, shader parameters, the bones list, LOD regenerate.
   - The UV overlap check against the body's UVs (the mockup's "overlaps the body's UVs"), and the viewport's UVs mode.
   - The CAS camera, pose and animation, Outfit….
