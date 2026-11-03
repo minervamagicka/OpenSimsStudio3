@@ -22,8 +22,8 @@ public static class ConfirmDialog
         for (var i = 0; i < buttons.Length; i++)
         {
             var index = i;
-            var button = new Button { Content = buttons[i], MinHeight = 38, Padding = new Thickness(16, 6), HorizontalAlignment = HorizontalAlignment.Left };
-            if (i == 0) { button.Classes.Add("primary"); button.FontSize = 14; button.MinHeight = 38; }
+            var button = new Button { Content = buttons[i], Padding = new Thickness(16, 6), HorizontalAlignment = HorizontalAlignment.Left };
+            if (i == 0) { button.Classes.Add("primary"); button.FontSize = 14; }
             button.Click += (_, _) => { choice = index; dialog.Close(); };
             row.Children.Add(button);
         }

@@ -23,7 +23,8 @@ against the boards, or against screenshots shared outside the repo.
   - Success `#A8DBB8`, Warn `#F2C46D`, destructive `#FF8F8F` on `#6B3A40`.
 - **Shapes and type:**
   - Fonts: Inter; JetBrains Mono for keys and hashes.
-  - 6 px corners; buttons 44 px high.
+  - 6 px corners; buttons 44 px high (decided 2026-11-03, over the boards' 34–36 px). Compact controls keep their own
+    height: colour swatches, small row actions (30–32 px) and the editor header's Save, which matches its 34 px combo boxes.
   - The page's main action is a 60 px coral button with 18 px semibold text.
   - Section labels are 10 px semibold uppercase in Muted.
   - Selection: a coral border on `#252E3A`, or a 3 px coral marker on rail items.

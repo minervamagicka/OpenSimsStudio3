@@ -19,7 +19,7 @@ public sealed class BlenderPicker : StackPanel
     public BlenderPicker()
     {
         Spacing = 6;
-        var browse = new Button { Content = "Browse…", MinHeight = 36, Padding = new Thickness(12, 4), FontSize = 13, HorizontalAlignment = HorizontalAlignment.Left };
+        var browse = new Button { Content = "Browse…", Padding = new Thickness(12, 4), FontSize = 13, HorizontalAlignment = HorizontalAlignment.Left };
         browse.Click += async (_, _) => await BrowseAsync();
         Children.Add(new DockPanel { Children = { browse, _box }, LastChildFill = true });
         DockPanel.SetDock(browse, Dock.Right);

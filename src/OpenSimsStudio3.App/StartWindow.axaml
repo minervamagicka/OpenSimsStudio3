@@ -15,7 +15,7 @@
                     <TextBlock Classes="eyebrow" Text="RECENT PROJECTS" Margin="10,0,0,8" />
                     <TextBlock x:Name="NoRecents" Text="No projects yet" Foreground="{StaticResource Muted}" FontSize="13" Margin="10,0,0,0" />
                     <StackPanel x:Name="Recents" Spacing="2" />
-                    <Button Content="Open project…" Margin="0,10,0,0" MinHeight="40" Padding="12,8" Click="OpenProject" />
+                    <Button Content="Open project…" Margin="0,10,0,0" Padding="12,8" Click="OpenProject" />
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Bottom">
                     <Button Classes="navigation" Content="Settings" Click="ShowSettings" />

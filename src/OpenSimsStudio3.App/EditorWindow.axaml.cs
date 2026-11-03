@@ -382,8 +382,8 @@ public partial class EditorWindow : Window
 
         // Edit in Blender: the group goes to <project>\work as .simgeom; the user exports back over the same file.
         var file = Path.Combine(_session.Folder, "work", $"LOD{lod.Id}_group{index}.simgeom");
-        var edit = new Button { Content = "Edit in Blender", Classes = { "primary" }, FontSize = 14, MinHeight = 40, Padding = new Thickness(14, 6) };
-        var reimport = new Button { Content = "Re-import", MinHeight = 40, Padding = new Thickness(14, 6) };
+        var edit = new Button { Content = "Edit in Blender", Classes = { "primary" }, FontSize = 14, Padding = new Thickness(14, 6) };
+        var reimport = new Button { Content = "Re-import", Padding = new Thickness(14, 6) };
         var status = Muted12(File.Exists(file) ? $"Working file: {file}" : "Opens this group in Blender with GEOM Tools. Export back over the same file, then re-import.");
         reimport.IsEnabled = File.Exists(file);
         edit.Click += (_, _) =>

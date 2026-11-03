@@ -201,7 +201,7 @@ public partial class BrowseView : UserControl
     {
         foreach (var (target, label) in new[] { (ProjectTarget.Retail, "Retail"), (ProjectTarget.Both, "Both"), (ProjectTarget.OpenTS3Only, "OpenTS3 only") })
         {
-            var button = new Button { Content = label, MinHeight = 40, Padding = new Avalonia.Thickness(14, 8), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+            var button = new Button { Content = label, Padding = new Avalonia.Thickness(14, 8), HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
             if (target == _target) button.Classes.Add("selected");
             button.Click += (_, _) =>
             {
