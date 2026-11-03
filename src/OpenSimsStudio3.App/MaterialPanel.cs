@@ -46,11 +46,23 @@ public sealed class MaterialPanel : StackPanel
     /// <summary>Applies one edit to the stored GEOM; returns false (and changes nothing) when the edit is refused.</summary>
     bool Commit(Action<GeomMaterial> edit, bool rebuild = false)
     {
-        if (_session.Read(_key) is not { } bytes || GeomMaterial.Read(bytes) is not { } material) return false;
-        var shaderBefore = material.Shader;
-        try { edit(material); }
-        catch (Exception e) when (e is ArgumentException or InvalidOperationException) { return false; }
-        var written = material.Write(bytes);
+        if (_session.Read(_key) is not { } bytes) return false;
+        GeomMaterial? material;
+        byte[] written;
+        uint shaderBefore;
+        try
+        {
+            if ((material = GeomMaterial.Read(bytes)) == null) return false;
+            shaderBefore = material.Shader;
+            edit(material);
+            written = material.Write(bytes);
+        }
+        catch (Exception e) when (e is ArgumentException or InvalidOperationException or InvalidDataException or EndOfStreamException
+                                      or System.Reflection.TargetInvocationException)
+        {
+            Console.Error.WriteLine($"OSS3: material edit on {_key} refused: {e.Message}");
+            return false;
+        }
         if (written.AsSpan().SequenceEqual(bytes)) return true;
         _session.Replace(_key, written);
         Changed?.Invoke(material.Shader != shaderBefore);
