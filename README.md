@@ -62,7 +62,7 @@ The target look and every UI decision live in [`docs/ui/DESIGN.md`](docs/ui/DESI
 
 ## Building
 
-Requirements: the [.NET 10 SDK](https://dotnet.microsoft.com/download), a Vulkan-capable GPU and driver, and for
+Requirements: the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (x64; `global.json` asks for 10.0.100 or a later 10.0 SDK, so an older SDK fails with one clear message), a Vulkan-capable GPU and driver, and for
 the app and install checks, a Windows install of The Sims 3. Blender with GEOM Tools is optional (Edit in Blender).
 
 ```
