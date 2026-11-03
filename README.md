@@ -108,10 +108,32 @@ dotnet artifacts/bin/OpenSimsStudio3.Probe/release/OpenSimsStudio3.Probe.dll ins
 
 ## Contributing
 
-Not open for contributions yet; it will be once the first release is in sight. When it is: code written for this
-repository only, with anything else listed in [`PROVENANCE.md`](PROVENANCE.md); no game files or anything derived
-from them in the repository; and every PR says what was checked and how. [`CLAUDE.md`](CLAUDE.md) has the working
-rules in full.
+Contributions are welcome. For anything larger than a fix, open an issue first so the work fits the plan.
+
+**In scope**
+- **CAS content creation:** the items under [Planned](#planned), and fixes or polish to what already works.
+- **UI:** changes that follow [`docs/ui/DESIGN.md`](docs/ui/DESIGN.md). Update that file when a design decision changes.
+- **Formats:** reading and writing TS3 resources, with byte-for-byte round trips kept intact.
+- **Checks:** probe commands, tests and test data made for the purpose.
+- **Docs:** format notes, building on other setups, and fixes to these docs.
+- **Bug reports:** what you did, what happened, and your game version and packs.
+
+**Out of scope for now**
+- Build/Buy objects and patterns, until CAS is complete.
+- Integrations with other tools or games. OpenTS3 export support will be written here by the maintainers, and its
+  code must not be copied in.
+- Gameplay or script mods. OSS3 makes content; it does not change the game.
+
+**Rules for every PR**
+- **Your own code only.** Code from another project needs an entry in [`PROVENANCE.md`](PROVENANCE.md) agreed
+  before it lands.
+- **No game data in the repository.** That covers textures, meshes, XML, packages and screenshots taken from the
+  game, and anything derived from them.
+- **s3pi changes are recorded** in `third_party/s3pi/OPENSIMSSTUDIO3-PROVENANCE.md`.
+- **Say what you checked and how.** That includes the build, probe runs and in-game tests. Name any check you
+  couldn't run, and the maintainers will run it.
+
+The full working rules are in [`CLAUDE.md`](CLAUDE.md).
 
 ## Licence and credits
 
