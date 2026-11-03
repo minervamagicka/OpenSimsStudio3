@@ -74,6 +74,28 @@ public static class ImageResize
         return new DdsImage(side, side, square);
     }
 
+    /// <summary>
+    /// Crops to the pixels with any alpha and centres them on a transparent square whose side leaves
+    /// <paramref name="margin" /> (a fraction of the half-side, as in ThumbnailFraming) around the longer dimension.
+    /// Pixels are copied, not resampled. An image with no visible pixel comes back unchanged.
+    /// </summary>
+    public static DdsImage CropToContent(DdsImage source, float margin)
+    {
+        int minX = int.MaxValue, minY = int.MaxValue, maxX = -1, maxY = -1;
+        for (var y = 0; y < source.Height; y++)
+            for (var x = 0; x < source.Width; x++)
+                if (source.Rgba[(y * source.Width + x) * 4 + 3] != 0)
+                    (minX, minY, maxX, maxY) = (Math.Min(minX, x), Math.Min(minY, y), Math.Max(maxX, x), Math.Max(maxY, y));
+        if (maxX < 0) return source;
+        int w = maxX - minX + 1, h = maxY - minY + 1;
+        var side = (int)Math.Ceiling(Math.Max(w, h) / (1 - Math.Clamp(margin, 0f, 0.9f)));
+        int left = (side - w) / 2, top = (side - h) / 2;
+        var square = new byte[side * side * 4];
+        for (var y = 0; y < h; y++)
+            Array.Copy(source.Rgba, ((minY + y) * source.Width + minX) * 4, square, ((top + y) * side + left) * 4, w * 4);
+        return new DdsImage(side, side, square);
+    }
+
     static byte Unit(float v) => (byte)Math.Clamp(MathF.Round(v), 0, 255);
 
     /// <summary>For each target index, the source indices and weights (summing to 1) that make it.</summary>

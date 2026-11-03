@@ -5,6 +5,7 @@ namespace OpenSimsStudio3.Rendering;
 /// matching retail SimSkin and friends comes later. lightDirection.w = 1 samples the bound texture as albedo: a
 /// composited recolour, premultiplied, laid over a flat skin tone where its alpha is below 1 (a top's bare arms and
 /// neck), as the game layers clothing over skin. w = 2 is the flat skin tone alone (the Whole Sim body); w = 0 grey.
+/// w = 3 (thumbnails) cuts the texture out where its alpha is below one half, with no skin underneath.
 /// </summary>
 static class Shaders
 {
@@ -41,7 +42,13 @@ static class Shaders
             float sky = 0.5 + 0.5 * n.y;
             const vec3 skin = vec3(0.78, 0.62, 0.52);
             vec4 texel = texture(albedoMap, vUv);
-            vec3 albedo = pc.lightDirection.w > 1.5 ? skin
+            vec3 albedo;
+            if (pc.lightDirection.w > 2.5)
+            {
+                if (texel.a < 0.5) discard;
+                albedo = texel.rgb / texel.a;
+            }
+            else albedo = pc.lightDirection.w > 1.5 ? skin
                         : pc.lightDirection.w > 0.5 ? texel.rgb + skin * (1.0 - texel.a) : vec3(0.80, 0.78, 0.75);
             vec3 color = albedo * (0.18 + 0.62 * key) + vec3(0.10, 0.11, 0.14) * sky;
             outColor = vec4(color, 1.0);

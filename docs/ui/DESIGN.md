@@ -93,8 +93,16 @@ against the boards, or against screenshots shared outside the repo.
   - The texture window (PNG Import…/Export…, Clear, R/G/B/A view, Same in all recolours) and the link icon on shared slots.
   - The Export window (File › Export…, Ctrl+E) for the open project: checks with Show, .package and .sims3pack,
     Save to folder, the test-profile copy with cache clearing, and the Exported box with Show in folder.
-- **Not built:**
-  - Bake in the texture window, slot thumbnails, thumbnail Render/Replace, Patterns…, and the 3/4-channel toggle.
+  - The recolour block's thumbnail, as in the mockup: a 72 px tile, a muted "Thumbnail" label and Render / Replace…
+    (44 px buttons). A short status (render failed, untextured, not imported) appears beside the label in Warn,
+    with the detail in its tooltip.
+    - Render draws the recolour composited on LOD 0, framed from the front, with texels under half alpha cut out, on
+      a transparent background.
+    - Replace… takes a PNG of any size and fits it to each square size.
+    - Both store all three CAS sizes. Keys, sizes and sources are in `Formats/Thumbnails/README.md`; the keys are not
+      yet checked in game.
+  - Bake in the texture window, slot thumbnails, Patterns…, and the 3/4-channel toggle.
+  - The launcher (Sims3Pack) thumbnail in Advanced….
   - Fit to body, shader parameters, the bones list, LOD regenerate.
   - The UV overlap check against the body's UVs (the mockup's "overlaps the body's UVs"), and the viewport's UVs mode.
   - The CAS camera, pose and animation, Outfit….

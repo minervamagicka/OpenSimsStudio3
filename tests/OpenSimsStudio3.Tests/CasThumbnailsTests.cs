@@ -151,6 +151,26 @@ public class CasThumbnailsTests
         Assert.Equal(0, Alpha(0, 24));
     }
 
+    [Fact]
+    public void Crop_to_content_centres_the_visible_pixels_with_a_margin()
+    {
+        var image = Solid(100, 100, 0, 0, 0, 0);
+        for (var y = 10; y < 30; y++)
+            for (var x = 60; x < 70; x++) (image.Rgba[(y * 100 + x) * 4], image.Rgba[(y * 100 + x) * 4 + 3]) = (200, 255);
+        var cropped = ImageResize.CropToContent(image, 0.2f);
+        Assert.Equal((25, 25), (cropped.Width, cropped.Height));  // 20 / 0.8
+        byte Alpha(int x, int y) => cropped.Rgba[(y * 25 + x) * 4 + 3];
+        // 20 rows from row 2, 10 columns from column 7.
+        Assert.Equal(255, Alpha(7, 2));
+        Assert.Equal(255, Alpha(16, 21));
+        Assert.Equal(0, Alpha(6, 2));
+        Assert.Equal(0, Alpha(7, 1));
+        Assert.Equal(0, Alpha(17, 21));
+        Assert.Equal(0, Alpha(16, 22));
+        var empty = Solid(4, 4, 0, 0, 0, 0);
+        Assert.Same(empty, ImageResize.CropToContent(empty, 0.1f));
+    }
+
     // ---- Store and read ----
 
     [Fact]

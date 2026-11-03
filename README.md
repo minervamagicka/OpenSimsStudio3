@@ -34,7 +34,8 @@ viewport, one editor screen instead of a wizard, and source anyone can read and 
   - **Item properties** edit the part directly: type, clothing type, species, ages, genders, outfit categories, flags
     and own texture space.
   - **Recolours:** pick, duplicate and delete recolours; edit each channel's colour and enabled state; see every
-    texture slot with its real size and format; and watch a live preview composed on the mesh.
+    texture slot with its real size and format; watch a live preview composed on the mesh; and render or replace each
+    recolour's CAS thumbnail (not yet checked in game).
   - **Meshes:** every LOD and mesh group, **Edit in Blender** with GEOM Tools (Blender 3.x and 4.x; 4.x needs no
     add-on changes) and re-import with vertex colours and tangents preserved.
   - **Viewport:** Vulkan, camera presets, the whole Sim around the part, and the game's own body-shape morphs
@@ -50,7 +51,7 @@ preset XML does too.
 
 ## Planned
 
-- The texture window (import, bake, clear, share across recolours), thumbnails and patterns.
+- The texture window (import, bake, clear, share across recolours) and patterns.
 - Fit to body, UV checks, shader parameters, bones and LOD generation.
 - Merged export of several projects from the window, more export checks, and `.sims3pack` verified in game.
 - A CAS camera, poses and outfit preview.
