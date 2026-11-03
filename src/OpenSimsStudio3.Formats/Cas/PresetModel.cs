@@ -70,6 +70,14 @@ public sealed class PresetModel
         return enabled == null || !string.Equals(enabled, "false", StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>Turns off a stencil or logo slot's "… Enabled" value; false when the slot has no such value or it is already off.</summary>
+    public bool DisableTexture(string name)
+    {
+        if (Value(name + " Enabled") == null || !IsTextureUsed(name)) return false;
+        SetValue(name + " Enabled", "False");
+        return true;
+    }
+
     public void SetChannelEnabled(string channel, bool on) => SetValue(channel + " Enabled", on ? "True" : "False");
 
     /// <summary>Sets a solid-colour channel's colour (RGBA 0–1). Only patterns that carry a Color value can be set.</summary>
