@@ -37,6 +37,26 @@ public sealed record UvReport(int Channels, int TriangleCount, IReadOnlyList<UvI
     public bool IsClean => Issues.Count == 0;
 
     public UvIssue? Find(UvIssueKind kind, int channel = 0) => Issues.FirstOrDefault(i => i.Kind == kind && i.Channel == channel);
+
+    /// <summary>
+    /// The issues worth a warning. With <paramref name="layeredByDesign" /> (hair, whose strands share the same
+    /// texture on purpose) overlaps are left out. Flipped triangles that are part of a mirrored overlap are left to
+    /// that issue, so a mirrored layout warns once. The full <see cref="Issues" /> list keeps everything.
+    /// </summary>
+    public IEnumerable<UvIssue> Warnings(bool layeredByDesign = false)
+    {
+        foreach (var issue in Issues)
+        {
+            if (layeredByDesign && issue.Kind is UvIssueKind.Overlap or UvIssueKind.MirroredOverlap) continue;
+            if (issue.Kind == UvIssueKind.Flipped && !layeredByDesign && Find(UvIssueKind.MirroredOverlap, issue.Channel) is { } mirrored)
+            {
+                var rest = issue.Triangles.Except(mirrored.Triangles).ToArray();
+                if (rest.Length > 0) yield return issue with { Triangles = rest };
+                continue;
+            }
+            yield return issue;
+        }
+    }
 }
 
 /// <summary>

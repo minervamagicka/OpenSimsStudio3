@@ -303,4 +303,30 @@ public class UvAnalysisTests
         Assert.True(cleanTime < TimeSpan.FromSeconds(1), $"clean grid took {cleanTime.TotalMilliseconds:F0} ms");
         Assert.True(stackedTime < TimeSpan.FromSeconds(1), $"stacked grid took {stackedTime.TotalMilliseconds:F0} ms");
     }
+
+    [Fact]
+    public void Warnings_fold_mirrored_flips_and_skip_overlaps_on_layered_hair()
+    {
+        // Mirrored halves (0-63), a normal block (64-95) so counter-clockwise is the majority, and a mirrored island
+        // of its own (96-97): the halves' flips fold into the mirrored overlap, the island's stay.
+        var mesh = new TestMesh()
+            .Grid(4, 4, g => new Vector3(-g.X, g.Y, 0), g => g * 0.5f)
+            .Grid(4, 4, g => new Vector3(g.X, g.Y, 0), g => new Vector2(0.5f - g.X * 0.5f, g.Y * 0.5f))
+            .Grid(4, 4, g => new Vector3(g.X + 2, g.Y, 0), g => new Vector2(0.55f, 0) + g * 0.4f)
+            .Grid(1, 1, g => new Vector3(g.X + 5, g.Y, 0), g => new Vector2(0.9f - g.X * 0.3f, 0.6f + g.Y * 0.3f));
+        var report = mesh.Analyze();
+        var warnings = report.Warnings().ToList();
+        Assert.Equal([96, 97], warnings.Single(w => w.Kind == UvIssueKind.Flipped).Triangles);
+        Assert.Contains(warnings, w => w.Kind == UvIssueKind.MirroredOverlap);
+
+        var hair = report.Warnings(layeredByDesign: true).ToList();
+        Assert.DoesNotContain(hair, w => w.Kind is UvIssueKind.Overlap or UvIssueKind.MirroredOverlap);
+        Assert.Equal(34, hair.Single(w => w.Kind == UvIssueKind.Flipped).Count);
+
+        // Mirrored halves alone: no separate flipped warning.
+        var halves = new TestMesh()
+            .Grid(4, 4, g => new Vector3(-g.X, g.Y, 0), g => g * 0.5f)
+            .Grid(4, 4, g => new Vector3(g.X, g.Y, 0), g => new Vector2(0.5f - g.X * 0.5f, g.Y * 0.5f)).Analyze();
+        Assert.DoesNotContain(halves.Warnings(), w => w.Kind == UvIssueKind.Flipped);
+    }
 }

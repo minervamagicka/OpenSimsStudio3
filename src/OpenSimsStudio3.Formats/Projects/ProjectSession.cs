@@ -7,7 +7,11 @@ using GEOM = meshExpImp.ModelBlocks.GEOM;
 namespace OpenSimsStudio3.Formats.Projects;
 
 /// <summary>One GEOM of a LOD: a mesh group.</summary>
-public sealed record MeshGroup(ResourceKey Key, int Vertices, int Triangles, uint Shader, bool InProject, bool HasVertexColour, bool VertexColourAllZero);
+public sealed record MeshGroup(ResourceKey Key, int Vertices, int Triangles, uint Shader, bool InProject, bool HasVertexColour, bool VertexColourAllZero)
+{
+    /// <summary>The group's UV problems (<see cref="UvAnalysis" />); <see cref="UvReport.None" /> when it couldn't be read.</summary>
+    public UvReport UvCheck { get; init; } = UvReport.None;
+}
 
 /// <summary>One VPXY LOD entry (EA numbers them from 1) and its mesh groups.</summary>
 public sealed record MeshLod(int Id, IReadOnlyList<MeshGroup> Groups)
@@ -172,12 +176,18 @@ public sealed class ProjectSession : IResourceSource
             var geom = new GenericRCOLResource(0, new MemoryStream(bytes)).ChunkEntries.Select(c => c.RCOLBlock).OfType<GEOM>().First();
             var colours = geom.VertexData.SelectMany(v => v.Vertex.OfType<GEOM.ColorElement>()).Select(ColourOf).ToList();
             return new MeshGroup(key, geom.VertexData.Count, geom.Faces.Count, (uint)geom.Shader, _resources.ContainsKey(key),
-                colours.Count > 0, colours.Count > 0 && colours.All(c => c == 0));
+                colours.Count > 0, colours.Count > 0 && colours.All(c => c == 0)) { UvCheck = CheckUvs(key, bytes) };
         }
         catch (Exception error) when (error is InvalidDataException or EndOfStreamException or System.Reflection.TargetInvocationException)
         {
             return new MeshGroup(key, 0, 0, 0, _resources.ContainsKey(key), false, false);
         }
+    }
+
+    static UvReport CheckUvs(ResourceKey key, byte[] bytes)
+    {
+        try { return UvAnalysis.Analyze(GeomLoader.Read(new MemoryStream(bytes), key.ToString())); }
+        catch (InvalidDataException) { return UvReport.None; }
     }
 
     // s3pi's ColorElement has no public getter; the hair shaders read this ARGB (see research/undocumented-fields.md).
