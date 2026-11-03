@@ -29,8 +29,9 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="16,0">
                     <TextBlock x:Name="ProjectTitle" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    <Border Classes="chip" Padding="10,3"><TextBlock x:Name="TargetText" FontSize="12" /></Border>
                     <Border Classes="chip" Padding="10,3"><TextBlock x:Name="KindText" FontSize="12" /></Border>
+                    <TextBlock Text="Target" FontSize="12" Foreground="{StaticResource Muted}" VerticalAlignment="Center" Margin="6,0,0,0" />
+                    <ComboBox x:Name="TargetBox" MinHeight="34" MinWidth="130" FontSize="13" />
                 </StackPanel>
             </DockPanel>
         </Border>

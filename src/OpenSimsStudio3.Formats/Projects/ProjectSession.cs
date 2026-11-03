@@ -85,6 +85,27 @@ public sealed class ProjectSession : IResourceSource
         if (key.Type is Vpxy or Geom) ReadLods();
     }
 
+    /// <summary>
+    /// The project's settings that only apply to OpenTS3, by name. OSS3 writes no OpenTS3-only data yet (see
+    /// <see cref="ProjectExport" />), so the list is empty; each such setting adds itself here and to
+    /// <see cref="ChangeTarget" />'s removal.
+    /// </summary>
+    public IReadOnlyList<string> OpenTS3OnlySettings() => [];
+
+    /// <summary>The settings changing the target to <paramref name="target" /> would remove; empty when nothing goes.</summary>
+    public IReadOnlyList<string> SettingsRemovedBy(ProjectTarget target) =>
+        ProjectTargets.RemovedSettings(Project.ParsedTarget, target, OpenTS3OnlySettings());
+
+    /// <summary>
+    /// Changes the project's target and writes project.json at once (the package is untouched). Callers ask first
+    /// when <see cref="SettingsRemovedBy" /> is not empty; removing those settings belongs here once any exist.
+    /// </summary>
+    public void ChangeTarget(ProjectTarget target)
+    {
+        if (target == Project.ParsedTarget && Project.Target == target.Id()) return;
+        Project = Project.WriteTarget(Folder, target);
+    }
+
     /// <summary>The recolour's preset XML as an editable model.</summary>
     public Cas.PresetModel Preset(int index) => Cas.PresetModel.Parse(Part.Presets[index].XmlFile.ReadToEnd());
 

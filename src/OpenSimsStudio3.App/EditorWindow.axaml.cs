@@ -69,7 +69,7 @@ public partial class EditorWindow : Window
 
         Title = $"OpenSimsStudio³ · {session.Project.Name}";
         ProjectTitle.Text = session.Project.Name;
-        TargetText.Text = session.Project.Target switch { "OpenTS3Only" => "OpenTS3 only", var t => t };
+        BuildTargetPicker();
         KindText.Text = session.Project.Kind == "CasDefaultReplacement" ? "Default replacement" : "New item";
 
         SaveButton.Click += (_, _) => Save();
@@ -109,6 +109,48 @@ public partial class EditorWindow : Window
     }
 
     CASPartResource.CASPartResource Part => _session.Part;
+
+    bool _targetReverting;
+
+    /// <summary>
+    /// The title bar's target picker (DESIGN.md, "Project target"). A change is written to project.json at once; when it
+    /// would remove OpenTS3-only settings, it lists them and asks first. OpenTS3OnlyGate controls follow the target.
+    /// </summary>
+    void BuildTargetPicker()
+    {
+        TargetBox.ItemsSource = ProjectTargets.All.Select(t => t.DisplayName()).ToList();
+        ShowTarget();
+        TargetBox.SelectionChanged += async (_, _) =>
+        {
+            if (_targetReverting || TargetBox.SelectedIndex < 0) return;
+            var next = ProjectTargets.All[TargetBox.SelectedIndex];
+            if (next == _session.Project.ParsedTarget) return;
+            var removed = _session.SettingsRemovedBy(next);
+            if (removed.Count > 0 && await ConfirmDialog.Ask(this, $"Change target to {next.DisplayName()}?",
+                    "These OpenTS3-only settings will be removed:\n" + string.Join("\n", removed.Select(r => "• " + r)),
+                    "Change and remove", "Cancel") != 0)
+            {
+                ShowTarget();
+                return;
+            }
+            try { _session.ChangeTarget(next); }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            {
+                Console.Error.WriteLine($"OSS3: changing the target of {_session.Folder} failed: {error}");
+                await ConfirmDialog.Ask(this, "Could not change the target", error.Message, "OK");
+            }
+            ShowTarget();
+        };
+    }
+
+    void ShowTarget()
+    {
+        var target = _session.Project.ParsedTarget;
+        _targetReverting = true;
+        TargetBox.SelectedIndex = ProjectTargets.All.ToList().IndexOf(target);
+        _targetReverting = false;
+        OpenTS3OnlyGate.SetTarget(this, target);
+    }
 
     int _composeGeneration;
 

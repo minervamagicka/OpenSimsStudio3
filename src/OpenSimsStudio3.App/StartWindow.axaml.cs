@@ -8,6 +8,7 @@ using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using OpenSimsStudio3.Formats.Install;
+using OpenSimsStudio3.Formats.Projects;
 
 namespace OpenSimsStudio3.App;
 
@@ -46,7 +47,7 @@ public partial class StartWindow : Window
             catch (Exception error) when (error is IOException or UnauthorizedAccessException or InvalidDataException or System.Text.Json.JsonException) { continue; }
             var row = new StackPanel { Spacing = 2 };
             row.Children.Add(new TextBlock { Text = project.Name, FontSize = 13, TextTrimming = TextTrimming.CharacterEllipsis, TextWrapping = TextWrapping.NoWrap });
-            row.Children.Add(new TextBlock { Text = $"{project.SourceName} · {project.Target}", FontSize = 12, Foreground = Muted, TextTrimming = TextTrimming.CharacterEllipsis, TextWrapping = TextWrapping.NoWrap });
+            row.Children.Add(new TextBlock { Text = $"{project.SourceName} · {project.ParsedTarget.DisplayName()}", FontSize = 12, Foreground = Muted, TextTrimming = TextTrimming.CharacterEllipsis, TextWrapping = TextWrapping.NoWrap });
             var button = new Button { Content = row, HorizontalContentAlignment = HorizontalAlignment.Left, BorderThickness = new Thickness(0), Padding = new Thickness(10, 6), MinHeight = 0 };
             ToolTip.SetTip(button, folder);
             var open = folder;
@@ -217,6 +218,18 @@ public partial class StartWindow : Window
         PageTitle.Text = "Settings";
     }
 
+    void ShowAbout(object? sender, RoutedEventArgs e)
+    {
+        BrowseHost.Content = new AboutView(ShowHome);
+        BrowseHost.IsVisible = true;
+        HomePage.IsVisible = false;
+        PageTitle.Text = "About";
+    }
+
+    /// <summary>Opens a new GitHub issue in the browser with the version and OS filled in; the user writes and sends it.</summary>
+    async void ReportBug(object? sender, RoutedEventArgs e) =>
+        await AboutView.Open(this, Formats.Support.AppInfo.BugReportUrl(AboutView.Version, Formats.Support.AppInfo.OperatingSystem));
+
     void ShowHome()
     {
         BrowseHost.Content = null;
@@ -236,7 +249,7 @@ public partial class StartWindow : Window
             var folder = await Task.Run(() =>
             {
                 Directory.CreateDirectory(root);
-                return Formats.Projects.Project.CreateCasClone(root, name, target.ToString(), index,
+                return Formats.Projects.Project.CreateCasClone(root, name, target, index,
                     new ResourceKey(0x034AEECB, item.Group, item.Instance), item.Name, item.ProductMajor,
                     (index as PackageOverGame)?.PackagePath ?? "", defaultReplacement);
             });
@@ -304,7 +317,4 @@ public partial class StartWindow : Window
         }
         await OpenProjectAsync(path);
     }
-
-    // Start cards and rail pages are wired as their screens are built.
-    void NotYet(object? sender, RoutedEventArgs e) { }
 }
